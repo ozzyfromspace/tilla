@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"tilla/controllers"
 	"tilla/models"
+	"time"
 )
 
 func main() {
@@ -23,12 +25,31 @@ func main() {
 	minLocalTime := "2023-02-27T07:59:59-05:00"
 	maxLocalTime := "2023-03-03T19:00:01-05:00"
 
+	timeLayout := "2006-01-02T15:04:05-07:00"
+	t, _ := time.Parse(timeLayout, minLocalTime)
+
 	cal := controllers.NewCalendar(db)
-	calEvents, err := cal.GetEvents(studentId, minLocalTime, maxLocalTime)
+	fmt.Println("getting events")
+
+	returnedStudent, err := db.GetStudentById(studentId)
+
+	if err != nil {
+		log.Fatal("could not find student!")
+	}
+
+	log.Println("returned student", returnedStudent)
+	calEvents, droppedEvents, err := cal.GetEvents(returnedStudent, minLocalTime, maxLocalTime)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println("EVENTS", calEvents)
+	log.Println("CHOSEN EVENTS -", calEvents)
+	log.Println("DROPPED EVENTS -", droppedEvents)
+
+	convDoc := &[]controllers.ConversionDoc{
+		{Student: returnedStudent, Events: calEvents},
+	}
+
+	controllers.GenerateExcel(convDoc, int(t.Month()), t.Year())
 }
