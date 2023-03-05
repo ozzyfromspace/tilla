@@ -46,6 +46,12 @@ Content-Type: application/json
 }
 
 ###
+GET http://localhost:8080/student/6403e570ffe7eb0ff530105b
+
+###
+GET http://localhost:8080/teacher/6403e582ffe7eb0ff530105c
+
+###
 GET http://localhost:8080/students
 
 ###

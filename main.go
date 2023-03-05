@@ -103,5 +103,41 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"teachers": *teachers})
 	})
 
+	r.GET("/student/:id", func(c *gin.Context) {
+		studentId, found := c.Params.Get("id")
+
+		if !found {
+			c.JSON(http.StatusUnprocessableEntity, models.MsgPayload("no student id provided"))
+			return
+		}
+
+		student, err := db.GetStudentById(studentId)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, models.MsgPayload("could not retrieve student"))
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"student": *student})
+	})
+
+	r.GET("/teacher/:id", func(c *gin.Context) {
+		studentId, found := c.Params.Get("id")
+
+		if !found {
+			c.JSON(http.StatusBadRequest, models.MsgPayload("no teacher id provided"))
+			return
+		}
+
+		student, err := db.GetTeacherById(studentId)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, models.MsgPayload("could not retrieve teacher"))
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"teacher": *student})
+	})
+
 	r.Run(":8080")
 }
