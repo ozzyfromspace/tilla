@@ -1,0 +1,52 @@
+POST http://localhost:8080/create/student
+Content-Type: application/json
+
+{
+  "firstName": "pepper",
+  "lastName": "potts",
+  "nickname": "hottie"
+}
+
+###
+
+POST http://localhost:8080/create/teacher
+Content-Type: application/json
+
+{
+  "firstName": "bob",
+  "lastName": "ross",
+  "nickname": "calme"
+}
+
+###
+
+POST http://localhost:8080/create/subject
+Content-Type: application/json
+
+{
+  "studentId": "6403e570ffe7eb0ff530105b",
+  "subjects": [
+    {
+      "name": "Track",
+      "pricePerHour": 267.22
+    },
+    {
+      "name": "History",
+      "pricePerHour": 20.78
+    },
+    {
+      "name": "Group Meeting",
+      "pricePerHour": 12.56
+    },
+    {
+      "name": "Dance",
+      "pricePerHour": 78.09
+    }
+  ]
+}
+
+###
+GET http://localhost:8080/students
+
+###
+GET http://localhost:8080/teachers
