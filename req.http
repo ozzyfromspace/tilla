@@ -1,26 +1,27 @@
-POST http://localhost:8080/create/student
+POST http://localhost:8080/student
 Content-Type: application/json
 
 {
-  "firstName": "pepper",
-  "lastName": "potts",
-  "nickname": "hottie"
+  "firstName": "Jack",
+  "lastName": "Btesh",
+  "nickname": "Jack",
+  "calendarId": "c_ath9g8cs5n551v6ve3b96m6tio@group.calendar.google.com"
 }
 
 ###
 
-POST http://localhost:8080/create/teacher
+POST http://localhost:8080/teacher
 Content-Type: application/json
 
 {
-  "firstName": "bob",
-  "lastName": "ross",
-  "nickname": "calme"
+  "firstName": "Ashley",
+  "lastName": "Sarver",
+  "nickname": "Ashley"
 }
 
 ###
 
-POST http://localhost:8080/create/subject
+POST http://localhost:8080/student/subject
 Content-Type: application/json
 
 {

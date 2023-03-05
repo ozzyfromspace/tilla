@@ -2,142 +2,33 @@ package main
 
 import (
 	"log"
-	"net/http"
+	"tilla/controllers"
 	"tilla/models"
-
-	"github.com/gin-gonic/gin"
 )
 
-var uri = "mongodb+srv://scheduler:Schedulethejoy@eclipsecluster.mvengjn.mongodb.net/?retryWrites=true&w=majority"
-
 func main() {
-	db := &models.Database{}
+	db := models.NewDatabase()
+	//
+	// 	r := gin.Default()
+	//
+	// 	apis.NewStudentApi(r, db).RegisterApi()
+	// 	apis.NewTeacherApi(r, db).RegisterApi()
+	//
+	// 	r.Run(":8080")
 
-	if err := db.Connect(uri); err != nil {
-		log.Fatalf("[1]: %v/n", err)
+	// calId := "c_ath9g8cs5n551v6ve3b96m6tio@group.calendar.google.com"
+
+	studentId := "640443353d1ffb09ae445fdc"
+
+	minLocalTime := "2023-02-27T07:59:59-05:00"
+	maxLocalTime := "2023-03-03T19:00:01-05:00"
+
+	cal := controllers.NewCalendar(db)
+	calEvents, err := cal.GetEvents(studentId, minLocalTime, maxLocalTime)
+
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	log.Printf("[2]: %+v\n", db)
-
-	r := gin.Default()
-	createGroup := r.Group("create")
-
-	createGroup.POST("/teacher", func(c *gin.Context) {
-		newTeacher := models.NewTeacher()
-
-		if err := c.BindJSON(newTeacher); err != nil {
-			log.Print(err)
-			c.JSON(http.StatusUnprocessableEntity, models.MsgPayload("invalid body, could not parse teacher"))
-			return
-		}
-
-		if err := db.AddTeacher(newTeacher); err != nil {
-			log.Print(err)
-			c.JSON(http.StatusInternalServerError, models.MsgPayload("failed to save new teacher to database"))
-			return
-		}
-
-		c.JSON(http.StatusCreated, models.MsgPayload("teacher created!"))
-	})
-
-	createGroup.POST("/student", func(c *gin.Context) {
-		newStudent := models.NewStudent()
-
-		if err := c.BindJSON(newStudent); err != nil {
-			log.Print(err)
-			c.JSON(http.StatusUnprocessableEntity, models.MsgPayload("invalid body, could not parse student"))
-			return
-		}
-
-		if err := db.AddStudent(newStudent); err != nil {
-			log.Print(err)
-			c.JSON(http.StatusInternalServerError, models.MsgPayload("failed to save new student to database"))
-			return
-		}
-
-		c.JSON(http.StatusCreated, models.MsgPayload("student created!"))
-	})
-
-	createGroup.POST("/subject", func(c *gin.Context) {
-		subjectPayload := models.NewSubjectPayload()
-
-		if err := c.BindJSON(subjectPayload); err != nil {
-			log.Print(err)
-			c.JSON(http.StatusUnprocessableEntity, models.MsgPayload("invalid body, could not parse subjects"))
-			return
-		}
-
-		if err := db.AddSubjects(*subjectPayload); err != nil {
-			log.Println("ERR1 -", err)
-			c.JSON(http.StatusUnprocessableEntity, models.MsgPayload(err.Error()))
-			return
-		}
-
-		if len(subjectPayload.Subjects) == 1 {
-			c.JSON(http.StatusCreated, models.MsgPayload("subject created!"))
-			return
-		}
-
-		c.JSON(http.StatusCreated, models.MsgPayload("subjects created!"))
-	})
-
-	r.GET("/students", func(c *gin.Context) {
-		students, err := db.GetStudents()
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, models.MsgPayload("could not retrieve students"))
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"students": *students})
-	})
-
-	r.GET("/teachers", func(c *gin.Context) {
-		teachers, err := db.GetTeachers()
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, models.MsgPayload("could not retrieve teachers"))
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"teachers": *teachers})
-	})
-
-	r.GET("/student/:id", func(c *gin.Context) {
-		studentId, found := c.Params.Get("id")
-
-		if !found {
-			c.JSON(http.StatusUnprocessableEntity, models.MsgPayload("no student id provided"))
-			return
-		}
-
-		student, err := db.GetStudentById(studentId)
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, models.MsgPayload("could not retrieve student"))
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"student": *student})
-	})
-
-	r.GET("/teacher/:id", func(c *gin.Context) {
-		studentId, found := c.Params.Get("id")
-
-		if !found {
-			c.JSON(http.StatusBadRequest, models.MsgPayload("no teacher id provided"))
-			return
-		}
-
-		student, err := db.GetTeacherById(studentId)
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, models.MsgPayload("could not retrieve teacher"))
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"teacher": *student})
-	})
-
-	r.Run(":8080")
+	log.Println("EVENTS", calEvents)
 }

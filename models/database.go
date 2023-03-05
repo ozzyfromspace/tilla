@@ -3,6 +3,8 @@ package models
 import (
 	"context"
 	"errors"
+	"log"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -22,6 +24,18 @@ type Database struct {
 	ready  bool
 	client *mongo.Client
 	db     *mongo.Database
+}
+
+const uri = "mongodb+srv://scheduler:Schedulethejoy@eclipsecluster.mvengjn.mongodb.net/?retryWrites=true&w=majority"
+
+func NewDatabase() *Database {
+	db := &Database{}
+
+	if err := db.Connect(uri); err != nil {
+		log.Fatal(err)
+	}
+
+	return db
 }
 
 const StudentsCollection = "Students"
@@ -55,6 +69,7 @@ func (dba *Database) AddTeacher(teacher *Teacher) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 
+	teacher.Nickname = strings.ToLower(teacher.Nickname)
 	_, err := teacherCollection.InsertOne(ctx, *teacher)
 	defer cancel()
 	return err
@@ -133,6 +148,22 @@ func (dba *Database) GetTeacherById(teacherId string) (*Teacher, error) {
 	foundTeacher := NewTeacher()
 
 	err = teacherCollection.FindOne(context.Background(), filter).Decode(foundTeacher)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return foundTeacher, nil
+}
+
+func (dba *Database) GetTeacherByNickname(nickname string) (*Teacher, error) {
+	teacherCollection := dba.db.Collection(TeachersCollection)
+
+	filter := bson.D{{Key: "nickname", Value: strings.ToLower(nickname)}}
+
+	foundTeacher := NewTeacher()
+
+	err := teacherCollection.FindOne(context.Background(), filter).Decode(foundTeacher)
 
 	if err != nil {
 		return nil, err
