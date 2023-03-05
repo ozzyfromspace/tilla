@@ -47,6 +47,24 @@ Content-Type: application/json
 }
 
 ###
+POST http://localhost:8080/student/subject
+Content-Type: application/json
+
+{
+  "studentId": "640443353d1ffb09ae445fdc",
+  "subjects": [
+    {
+      "name": "World History",
+      "pricePerHour": 29
+    },
+    {
+      "name": "Group Academic Coaching",
+      "pricePerHour": 15
+    }
+  ]
+}
+
+###
 GET http://localhost:8080/student/6403e570ffe7eb0ff530105b
 
 ###

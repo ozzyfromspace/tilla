@@ -96,8 +96,15 @@ func (dba *Database) AddSubjects(subjectPayload SubjectPayload) error {
 		return err
 	}
 
+	var lowercaseSubjects = make(map[string]float64)
+
+	for k, v := range studentSubjects {
+		computedKey := ComputeSubjectName(k)
+		lowercaseSubjects[computedKey] = v
+	}
+
 	filter := bson.D{{Key: "_id", Value: objectId}}
-	update := bson.M{"$set": bson.D{{Key: "subjects", Value: studentSubjects}}}
+	update := bson.M{"$set": bson.D{{Key: "subjects", Value: lowercaseSubjects}}}
 
 	result, err := studentCollection.UpdateOne(context.Background(), filter, update)
 
@@ -228,4 +235,9 @@ func (dba *Database) GetTeachers() (*[]Teacher, error) {
 	}
 
 	return teachers, err
+}
+
+func ComputeSubjectName(input string) string {
+	splitInput := strings.Split(strings.ToLower(input), " ")
+	return strings.Join(splitInput, "_")
 }

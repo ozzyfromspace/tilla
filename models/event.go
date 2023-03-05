@@ -1,12 +1,10 @@
 package models
 
-import "time"
-
 type Event struct {
 	StudentName   string
 	Course        string
 	Teacher       string
-	Date          time.Time
+	Date          string
 	Duration      string
 	Fee           float64
 	PaymentStatus string
