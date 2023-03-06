@@ -2,10 +2,10 @@ POST http://localhost:8080/student
 Content-Type: application/json
 
 {
-  "firstName": "Jack",
-  "lastName": "Btesh",
-  "nickname": "Jack",
-  "calendarId": "c_ath9g8cs5n551v6ve3b96m6tio@group.calendar.google.com"
+  "firstName": "Owen",
+  "lastName": "Butler",
+  "nickname": "owen",
+  "calendarId": "c_16fejdgr5i9j1ci0u94ch87ohg@group.calendar.google.com"
 }
 
 ###
@@ -51,15 +51,15 @@ POST http://localhost:8080/student/subject
 Content-Type: application/json
 
 {
-  "studentId": "640443353d1ffb09ae445fdc",
+  "studentId": "640599a4fcd7ba07c3b1d4f0",
   "subjects": [
     {
-      "name": "World History",
-      "pricePerHour": 29
+      "name": "HOMEWORK: Math",
+      "pricePerHour": 2
     },
     {
-      "name": "Group Academic Coaching",
-      "pricePerHour": 15
+      "name": "TYPING PRACTICE",
+      "pricePerHour": 1587
     }
   ]
 }
@@ -75,3 +75,12 @@ GET http://localhost:8080/students
 
 ###
 GET http://localhost:8080/teachers
+
+###
+POST http://localhost:8080/students/excel
+Content-Type: application/json
+
+{
+  "minLocalTime": "2023-02-27T07:59:59-05:00",
+  "maxLocalTime": "2023-03-03T19:00:01-05:00"
+}

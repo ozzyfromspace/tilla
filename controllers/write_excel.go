@@ -2,29 +2,34 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"tilla/models"
+	"time"
 
 	"github.com/xuri/excelize/v2"
 )
 
 type ConversionDoc struct {
-	Student *models.Student
-	Events  *models.Events
+	Student models.Student
+	Events  models.Events
 }
 
-func GenerateExcel(convDoc *[]ConversionDoc, month int, year int) {
+func generateExcel(convDoc *[]ConversionDoc, month time.Month, year int) error {
 	f := excelize.NewFile()
 	defer func() {
 		if err := f.Close(); err != nil {
 			fmt.Println(err)
+			return
 		}
 	}()
+
+	log.Printf("GENERATING EXCELS! %+v, %+v\n", (*convDoc)[0].Student, (*convDoc)[0].Events)
 
 	for ci, el := range *convDoc {
 		events := el.Events
 		student := el.Student
 
-		if len(*events) == 0 {
+		if len(events) == 0 {
 			continue
 		}
 
@@ -33,7 +38,7 @@ func GenerateExcel(convDoc *[]ConversionDoc, month int, year int) {
 		index, err := f.NewSheet(sheetName)
 		if err != nil {
 			fmt.Println(err)
-			return
+			return err
 		}
 
 		// create headers:
@@ -45,7 +50,7 @@ func GenerateExcel(convDoc *[]ConversionDoc, month int, year int) {
 		f.SetCellValue(sheetName, "F1", "Fee")
 		f.SetCellValue(sheetName, "G1", "Payment Status")
 
-		for i, event := range *events {
+		for i, event := range events {
 			f.SetCellValue(sheetName, coordinate(0, i+1), event.Course)
 			f.SetCellValue(sheetName, coordinate(1, i+1), event.Teacher)
 			f.SetCellValue(sheetName, coordinate(2, i+1), event.Date)
@@ -64,10 +69,13 @@ func GenerateExcel(convDoc *[]ConversionDoc, month int, year int) {
 	// y, m, _ := (*events)[0].DateTime.Date()
 
 	// Save spreadsheet by the given path.
-	filename := fmt.Sprintf("EclipseAcademy_%02v-%04v.xlsx", month, year)
+	filename := fmt.Sprintf("EclipseAcademy_%02v_%04v.xlsx", month, year)
 	if err := f.SaveAs(filename); err != nil {
 		fmt.Println(err)
+		return err
 	}
+
+	return nil
 }
 
 func coordinate(offset byte, row int) string {

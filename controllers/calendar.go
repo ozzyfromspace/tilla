@@ -15,14 +15,13 @@ import (
 	"google.golang.org/api/option"
 )
 
-// "c_ath9g8cs5n551v6ve3b96m6tio@group.calendar.google.com" -- calendar id for Jack Btesh
 const apiKey = "AIzaSyAp7UvmUT4SaeDat1z7dvrT1iFrjTF0res"
 const DEFAULT_TEACHER_NAME = "EINSTEIN"
 const PaymentStatus = "TO BE INVOICED"
 
 type DroppedEvent struct {
 	Summary string
-	Date    string
+	Date    time.Time
 	Student string
 }
 
@@ -39,7 +38,6 @@ func NewCalendar(db *models.Database) *Calendar {
 }
 
 func (cal *Calendar) GetEvents(returnedStudent *models.Student, minLocalTime string, maxLocalTime string) (*models.Events, *[]DroppedEvent, error) {
-
 	ctx := context.Background()
 	calendarService, err := calendar.NewService(ctx, option.WithAPIKey(apiKey))
 	if err != nil {
@@ -47,13 +45,10 @@ func (cal *Calendar) GetEvents(returnedStudent *models.Student, minLocalTime str
 	}
 
 	evts := calendarService.Events
-	listCall := evts.List(returnedStudent.CalendarId)
-
-	listCall = listCall.TimeMin(minLocalTime).TimeMax(maxLocalTime).SingleEvents(true)
-	e, err := listCall.Do()
+	e, err := evts.List(returnedStudent.CalendarId).TimeMin(minLocalTime).TimeMax(maxLocalTime).SingleEvents(true).Do()
 
 	if err != nil {
-		log.Fatalf("%v", err)
+		return nil, nil, err
 	}
 
 	droppedEvents := &[]DroppedEvent{}
@@ -61,16 +56,6 @@ func (cal *Calendar) GetEvents(returnedStudent *models.Student, minLocalTime str
 
 	for _, v := range e.Items {
 		newEvent := models.NewEvent()
-
-		// fmt.Printf("##########>>>>>>>>>>>>> Summary: %+v\nStarting Time: %+v\n", v.Summary, v.Start.DateTime)
-		fmt.Printf("####################START %v :::\n", v.Summary)
-		// fmt.Println("Course:", v.Summary)
-		// fmt.Println("Teacher:", v.Summary)
-		// fmt.Println("Student:", v.Summary)
-		// fmt.Println("Date:", v.Start.DateTime)
-		// fmt.Println("Duration:", v.Start.DateTime, v.End.DateTime)
-		// fmt.Println("Fee", "call db for student data...")
-		// fmt.Println("Payment Status:", "TO BE INVOICED")
 		newEvent.StudentName = strings.ToLower(fmt.Sprintf("%v-%v", returnedStudent.FirstName, returnedStudent.LastName))
 		foundTeacher, err := cal.getTeacher(strings.ToLower(v.Summary))
 
@@ -86,18 +71,13 @@ func (cal *Calendar) GetEvents(returnedStudent *models.Student, minLocalTime str
 		endTime, _ := time.Parse(timeLayout, v.End.DateTime)
 
 		newEvent.DateTime = startTime
-
-		fmt.Println("INFO ABOUT TIMES:", v.Start.DateTime, startTime, v.End.DateTime, endTime)
 		eventDuration := endTime.Sub(startTime)
-		fmt.Println("duration:", eventDuration)
-
 		subject, price, err := cal.getSubjectAndPrice(v.Summary, returnedStudent.Subjects)
 
 		if err != nil {
-			log.Println("COULD NOT FIND SUBJECT! DROPPING")
 			*droppedEvents = append(*droppedEvents, DroppedEvent{
 				Summary: v.Summary,
-				Date:    v.Start.DateTime,
+				Date:    startTime,
 				Student: fmt.Sprintf("%v %v", returnedStudent.FirstName, returnedStudent.LastName),
 			})
 			continue
@@ -111,17 +91,12 @@ func (cal *Calendar) GetEvents(returnedStudent *models.Student, minLocalTime str
 		newEvent.Date = getDateString(&startTime)
 		newEvent.PaymentStatus = PaymentStatus
 
-		// startTime.
 		t := fmt.Sprintf("%02v:%02v", startTime.Hour(), startTime.Minute())
 		newEvent.Time = t
 
 		*pickedEvents = append(*pickedEvents, *newEvent)
-
-		fmt.Printf("\nEVENT {%v}::: %+v :::EVENT\n\n", v.Summary, newEvent)
-		fmt.Println("####################END :::")
 	}
 
-	log.Println("Dropped Events", droppedEvents)
 	sort.Sort(pickedEvents)
 
 	return pickedEvents, droppedEvents, nil
@@ -152,7 +127,6 @@ func (cal *Calendar) getSubjectAndPrice(summaryStr string, subjects map[string]f
 	}
 
 	str = models.ComputeSubjectName(str)
-	fmt.Println("test subject -", str)
 	price, ok := subjects[str]
 
 	if !ok {
@@ -181,4 +155,44 @@ func formatSubject(str string) string {
 	}
 
 	return strings.Join(output, " ")
+}
+
+func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (map[string]*[]DroppedEvent, error) {
+	timeLayout := "2006-01-02T15:04:05-07:00"
+	t, err := time.Parse(timeLayout, minLocalTime)
+
+	if err != nil {
+		return nil, err
+	}
+
+	students, err := cal.db.GetStudents()
+
+	if err != nil {
+		log.Println("could not retrieve students from database")
+		return nil, err
+	}
+
+	convDoc := []ConversionDoc{}
+	droppedEventsMap := make(map[string](*[]DroppedEvent))
+
+	for _, s := range *students {
+		calEvents, droppedEvents, err := cal.GetEvents(&s, minLocalTime, maxLocalTime)
+
+		if err != nil {
+			log.Printf("could not extract events from %v %v's calendar with calendarId %v...\n%v\n", s.FirstName, s.LastName, truncateStr(s.CalendarId), err)
+			continue
+		}
+
+		key := fmt.Sprintf("%v_%v", s.Nickname, truncateStr(s.CalendarId))
+		droppedEventsMap[key] = droppedEvents
+
+		newConversionDoc := ConversionDoc{
+			Student: s,
+			Events:  *calEvents,
+		}
+
+		convDoc = append(convDoc, newConversionDoc)
+	}
+
+	return droppedEventsMap, generateExcel(&convDoc, t.Month(), t.Year())
 }
