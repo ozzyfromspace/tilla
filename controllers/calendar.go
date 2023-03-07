@@ -157,19 +157,19 @@ func formatSubject(str string) string {
 	return strings.Join(output, " ")
 }
 
-func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (map[string]*[]DroppedEvent, error) {
+func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (string, map[string]*[]DroppedEvent, error) {
 	timeLayout := "2006-01-02T15:04:05-07:00"
 	t, err := time.Parse(timeLayout, minLocalTime)
 
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	students, err := cal.db.GetStudents()
 
 	if err != nil {
 		log.Println("could not retrieve students from database")
-		return nil, err
+		return "", nil, err
 	}
 
 	convDoc := []ConversionDoc{}
@@ -194,5 +194,7 @@ func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (map[string]*[]D
 		convDoc = append(convDoc, newConversionDoc)
 	}
 
-	return droppedEventsMap, generateExcel(&convDoc, t.Month(), t.Year())
+	filepath, err := generateExcel(&convDoc, t.Month(), t.Year())
+
+	return filepath, droppedEventsMap, err
 }

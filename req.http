@@ -77,10 +77,19 @@ GET http://localhost:8080/students
 GET http://localhost:8080/teachers
 
 ###
-POST http://localhost:8080/students/excel
+POST http://localhost:8080/excel
 Content-Type: application/json
 
 {
   "minLocalTime": "2023-02-27T07:59:59-05:00",
   "maxLocalTime": "2023-03-03T19:00:01-05:00"
 }
+
+###
+GET http://localhost:8080/excel
+
+###
+GET http://localhost:8080/excel/file.xlsx
+
+###
+GET http://localhost:8080/excel/EclipseAcademy_February_2023.xlsx

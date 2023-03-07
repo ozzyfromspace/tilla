@@ -14,7 +14,7 @@ type ConversionDoc struct {
 	Events  models.Events
 }
 
-func generateExcel(convDoc *[]ConversionDoc, month time.Month, year int) error {
+func generateExcel(convDoc *[]ConversionDoc, month time.Month, year int) (string, error) {
 	f := excelize.NewFile()
 	defer func() {
 		if err := f.Close(); err != nil {
@@ -33,12 +33,11 @@ func generateExcel(convDoc *[]ConversionDoc, month time.Month, year int) error {
 			continue
 		}
 
-		// y, m, _ := (*events)[0].DateTime.Date()
 		sheetName := fmt.Sprintf("%v %v - %v", student.FirstName, student.LastName, truncateStr(student.Id))
 		index, err := f.NewSheet(sheetName)
 		if err != nil {
 			fmt.Println(err)
-			return err
+			return "", err
 		}
 
 		// create headers:
@@ -59,23 +58,19 @@ func generateExcel(convDoc *[]ConversionDoc, month time.Month, year int) error {
 			f.SetCellValue(sheetName, coordinate(5, i+1), event.Fee)
 			f.SetCellValue(sheetName, coordinate(6, i+1), event.PaymentStatus)
 		}
-		// Set active sheet of the workbook.
 		if ci == 0 {
 			f.SetActiveSheet(index)
 		}
 	}
 
-	// x := (*convDoc[0]).
-	// y, m, _ := (*events)[0].DateTime.Date()
-
-	// Save spreadsheet by the given path.
 	filename := fmt.Sprintf("EclipseAcademy_%02v_%04v.xlsx", month, year)
 	if err := f.SaveAs(filename); err != nil {
 		fmt.Println(err)
-		return err
+		return "", err
 	}
 
-	return nil
+	// return fmt.Sprintf("./%v", filename), nil
+	return filename, nil
 }
 
 func coordinate(offset byte, row int) string {

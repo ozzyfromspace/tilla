@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"tilla/controllers"
 	"tilla/models"
 	"time"
@@ -30,6 +31,7 @@ func NewCalendarApi(r *gin.Engine, db *models.Database) *CalendarApi {
 
 func (api *CalendarApi) RegisterApi() {
 	api.createExcel()
+	api.downloadExcel()
 }
 
 type LocalTimes struct {
@@ -59,22 +61,23 @@ func (lt *LocalTimes) sort() error {
 }
 
 func (api *CalendarApi) createExcel() {
-	api.r.POST("/students/excel", func(c *gin.Context) {
+	api.r.POST("/excel", func(c *gin.Context) {
 		localTimes := &LocalTimes{}
 		if err := c.BindJSON(localTimes); err != nil {
 			c.JSON(http.StatusUnprocessableEntity, models.MsgPayload("could not process one or more local times"))
+			return
 		}
 
 		localTimes.sort()
 		cal := controllers.NewCalendar(api.db)
-		droppedEventsMap, err := cal.ToExcel(localTimes.MinLocalTime, localTimes.MaxLocalTime)
+		filepath, droppedEventsMap, err := cal.ToExcel(localTimes.MinLocalTime, localTimes.MaxLocalTime)
 
 		if err != nil {
 			log.Print(err)
 			c.JSON(http.StatusUnprocessableEntity, models.MsgPayload("failed to create excel file"))
+			return
 		}
 
-		// logs
 		for k, v := range droppedEventsMap {
 			fmt.Printf("Student - %v (%v):\n\n", (*v)[0].Student, k)
 
@@ -87,7 +90,46 @@ func (api *CalendarApi) createExcel() {
 			fmt.Printf("\n\n")
 		}
 
-		c.JSON(http.StatusCreated, models.MsgPayload("excel file has been created"))
+		c.JSON(http.StatusCreated, gin.H{
+			"msg":      "excel created!",
+			"filename": filepath,
+		})
 	})
+}
 
+func (api *CalendarApi) downloadExcel() {
+	api.r.GET("/excel/:filename", func(c *gin.Context) {
+		filename, found := c.Params.Get("filename")
+
+		if !found {
+			c.JSON(http.StatusBadRequest, models.MsgPayload("excel filename was not provided"))
+			return
+		}
+
+		file, err := os.Open(filename)
+
+		if err != nil {
+			log.Print(err)
+			c.JSON(http.StatusBadRequest, models.MsgPayload("could not find excel file"))
+			return
+		}
+
+		fileinfo, err := file.Stat()
+
+		if err != nil {
+			log.Print(err)
+			c.JSON(http.StatusInternalServerError, models.MsgPayload("could not retrieve created excel file stats"))
+			return
+		}
+
+		contentLength := fileinfo.Size()
+		contentType := "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+		contentDisposition := fmt.Sprintf("attachment; filename=\"%s\"", fileinfo.Name())
+
+		extraHeaders := map[string]string{
+			"Content-Disposition": contentDisposition,
+		}
+
+		c.DataFromReader(http.StatusOK, contentLength, contentType, file, extraHeaders)
+	})
 }
