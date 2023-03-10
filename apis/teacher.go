@@ -32,7 +32,7 @@ func (api *TeacherApi) RegisterApi() {
 }
 
 func (api *TeacherApi) createTeacher() {
-	api.r.POST("/teacher", func(c *gin.Context) {
+	api.r.POST(RTeacher, func(c *gin.Context) {
 		newTeacher := models.NewTeacher()
 
 		if err := c.BindJSON(newTeacher); err != nil {
@@ -52,7 +52,7 @@ func (api *TeacherApi) createTeacher() {
 }
 
 func (api *TeacherApi) getTeachers() {
-	api.r.GET("/teachers", func(c *gin.Context) {
+	api.r.GET(RTeachers, func(c *gin.Context) {
 		teachers, err := api.db.GetTeachers()
 
 		if err != nil {
@@ -65,7 +65,7 @@ func (api *TeacherApi) getTeachers() {
 }
 
 func (api *TeacherApi) getTeacher() {
-	api.r.GET("/teacher/:id", func(c *gin.Context) {
+	api.r.GET(RTeacher_id, func(c *gin.Context) {
 		studentId, found := c.Params.Get("id")
 
 		if !found {

@@ -44,13 +44,27 @@ func (lt *LocalTimes) sort() error {
 	tmin, err := time.Parse(timeLayout, lt.MinLocalTime)
 
 	if err != nil {
+		alternativeTimeLayout := "2006-01-02T15:04:05Z"
+		tmin, err = time.Parse(alternativeTimeLayout, lt.MinLocalTime)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	if err != nil {
 		return err
 	}
 
 	tmax, err := time.Parse(timeLayout, lt.MaxLocalTime)
 
 	if err != nil {
-		return err
+		alternativeTimeLayout := "2006-01-02T15:04:05Z"
+		tmax, err = time.Parse(alternativeTimeLayout, lt.MaxLocalTime)
+
+		if err != nil {
+			return err
+		}
 	}
 
 	if tmax.Before(tmin) {

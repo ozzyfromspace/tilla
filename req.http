@@ -2,10 +2,10 @@ POST http://localhost:8080/student
 Content-Type: application/json
 
 {
-  "firstName": "Owen",
-  "lastName": "Butler",
-  "nickname": "owen",
-  "calendarId": "c_16fejdgr5i9j1ci0u94ch87ohg@group.calendar.google.com"
+  "firstName": "Trey",
+  "lastName": "Smith",
+  "nickname": "tiger",
+  "calendarId": "qwerty@group.calendar.google.com"
 }
 
 ###
@@ -47,7 +47,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:8080/student/subject
+POST http://localhost:8080/student/subjects
 Content-Type: application/json
 
 {
@@ -76,13 +76,22 @@ GET http://localhost:8080/students
 ###
 GET http://localhost:8080/teachers
 
-###
+### - local time
 POST http://localhost:8080/excel
 Content-Type: application/json
 
 {
   "minLocalTime": "2023-02-27T07:59:59-05:00",
   "maxLocalTime": "2023-03-03T19:00:01-05:00"
+}
+
+### - UTC time
+POST http://localhost:8080/excel
+Content-Type: application/json
+
+{
+  "minLocalTime": "2023-02-27T12:59:59Z",
+  "maxLocalTime": "2023-03-04T00:00:01Z"
 }
 
 ###

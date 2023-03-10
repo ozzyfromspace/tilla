@@ -67,8 +67,27 @@ func (cal *Calendar) GetEvents(returnedStudent *models.Student, minLocalTime str
 		}
 
 		timeLayout := "2006-01-02T15:04:05-07:00"
-		startTime, _ := time.Parse(timeLayout, v.Start.DateTime)
-		endTime, _ := time.Parse(timeLayout, v.End.DateTime)
+		startTime, err := time.Parse(timeLayout, v.Start.DateTime)
+
+		if err != nil {
+			alternativeTimeLayout := "2006-01-02T15:04:05Z"
+			startTime, err = time.Parse(alternativeTimeLayout, minLocalTime)
+
+			if err != nil {
+				return nil, nil, err
+			}
+		}
+
+		endTime, err := time.Parse(timeLayout, v.End.DateTime)
+
+		if err != nil {
+			alternativeTimeLayout := "2006-01-02T15:04:05Z"
+			endTime, err = time.Parse(alternativeTimeLayout, minLocalTime)
+
+			if err != nil {
+				return nil, nil, err
+			}
+		}
 
 		newEvent.DateTime = startTime
 		eventDuration := endTime.Sub(startTime)
@@ -162,7 +181,12 @@ func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (string, map[str
 	t, err := time.Parse(timeLayout, minLocalTime)
 
 	if err != nil {
-		return "", nil, err
+		alternativeTimeLayout := "2006-01-02T15:04:05Z"
+		t, err = time.Parse(alternativeTimeLayout, minLocalTime)
+
+		if err != nil {
+			return "", nil, err
+		}
 	}
 
 	students, err := cal.db.GetStudents()

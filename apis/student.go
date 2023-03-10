@@ -33,7 +33,7 @@ func (api *StudentApi) RegisterApi() {
 }
 
 func (api *StudentApi) createStudent() {
-	api.r.POST("/student", func(c *gin.Context) {
+	api.r.POST(RStudent, func(c *gin.Context) {
 		newStudent := models.NewStudent()
 
 		if err := c.BindJSON(newStudent); err != nil {
@@ -53,7 +53,7 @@ func (api *StudentApi) createStudent() {
 }
 
 func (api *StudentApi) getStudent() {
-	api.r.GET("/student/:id", func(c *gin.Context) {
+	api.r.GET(RStudent_id, func(c *gin.Context) {
 		studentId, found := c.Params.Get("id")
 
 		if !found {
@@ -73,7 +73,7 @@ func (api *StudentApi) getStudent() {
 }
 
 func (api *StudentApi) getStudents() {
-	api.r.GET("/students", func(c *gin.Context) {
+	api.r.GET(RStudents, func(c *gin.Context) {
 		students, err := api.db.GetStudents()
 
 		if err != nil {
@@ -86,7 +86,7 @@ func (api *StudentApi) getStudents() {
 }
 
 func (api *StudentApi) addSubjects() {
-	api.r.POST("/student/subject", func(c *gin.Context) {
+	api.r.POST(RStudent_subjects, func(c *gin.Context) {
 		subjectPayload := models.NewSubjectPayload()
 
 		if err := c.BindJSON(subjectPayload); err != nil {
