@@ -9,6 +9,7 @@ import { Abril_Fatface } from 'next/font/google';
 import {
   ChangeEvent,
   Dispatch,
+  FormEvent,
   MouseEvent,
   SetStateAction,
   useCallback,
@@ -37,7 +38,6 @@ type StudentField = keyof Student;
 type StudentId = Omit<Student, 'calendarId' | 'nickname'> & { id: string };
 
 function toFullName(studentId: StudentId): string {
-  console.log('here!', studentId);
   return `${studentId.firstName} ${studentId.lastName}`;
 }
 
@@ -71,7 +71,6 @@ const Home = () => {
     calendarId: '',
   }));
 
-  const [fetched, setFetched] = useState(() => false);
   const [selectedPersonId, setSelectedPersonId] = useState<StudentId>(
     studentIds[0] ?? { firstName: '', lastName: '', id: '' }
   );
@@ -82,10 +81,6 @@ const Home = () => {
         console.log('error.', resp.statusText);
         return;
       }
-
-      if (fetched) return;
-
-      setFetched(() => true);
 
       setStudentIds(() => {
         const newStudentIds: StudentId[] = [];
@@ -100,19 +95,18 @@ const Home = () => {
           newStudentIds.push(idObj);
         }
 
-        if (!selectedPersonId.id && newStudentIds.length) {
+        if (newStudentIds.length) {
           setSelectedPersonId(() => ({ ...newStudentIds[0] }));
         }
 
         return newStudentIds;
       });
     });
-  }, [fetched, selectedPersonId.id]);
+  }, []);
 
   useEffect(() => {
-    if (fetched) return;
     fetchStudents();
-  }, [fetched, fetchStudents]);
+  }, [fetchStudents]);
 
   const handleStudentChange = (inputField: StudentField) => {
     return (e: ChangeEvent<HTMLInputElement>) => {
@@ -154,8 +148,6 @@ const Home = () => {
             .toLowerCase()
             .includes(query.toLowerCase());
         });
-
-  console.log('filtered people:', filteredPeople);
 
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
@@ -267,11 +259,81 @@ const Home = () => {
     }
 
     axios.post(`${BASE_URL}/student/subjects`, payload).then((resp) => {
-      console.log(resp);
+      if (resp.status === 201) {
+        setSubjectRows(() => [])
+      }
     });
   }
 
-  console.log('render 1:', studentIds, selectedPersonId);
+  const handleAddTeacherSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!teacher.firstName) {
+      console.log('no teacher firstname was provided');
+      return;
+    }
+
+    if (!teacher.lastName) {
+      console.log('no teacher lastname was provided');
+      return;
+    }
+
+    if (!teacher.nickname) {
+      console.log('no teacher nickname was provided');
+      return;
+    }
+
+    axios.post(`${BASE_URL}/teacher`, teacher).then((resp) => {
+      console.log(resp);
+
+      if (resp.status === 201) {
+        setTeacher(() => ({
+          firstName: '',
+          lastName: '',
+          nickname: '',
+        }));
+      }
+    });
+  };
+
+  const handleAddStudentSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!student.firstName) {
+      console.log('no student firstname was provided');
+      return;
+    }
+
+    if (!student.lastName) {
+      console.log('no student lastname was provided');
+      return;
+    }
+
+    if (!student.nickname) {
+      console.log('no student nickname was provided');
+      return;
+    }
+
+    if (!student.calendarId) {
+      console.log('no student calendar id was provided');
+      return;
+    }
+
+    axios.post(`${BASE_URL}/student`, student).then((resp) => {
+      console.log(resp);
+
+      if (resp.status === 201) {
+        fetchStudents();
+
+        setStudent(() => ({
+          firstName: '',
+          lastName: '',
+          nickname: '',
+          calendarId: '',
+        }));
+      }
+    });
+  };
 
   return (
     <div>
@@ -284,7 +346,7 @@ const Home = () => {
         </Tab.List>
         <Tab.Panels>
           <Tab.Panel>
-            <form>
+            <form onSubmit={handleAddStudentSubmit}>
               <RowInput
                 label="First Name"
                 inputValue={student.firstName}
@@ -309,7 +371,7 @@ const Home = () => {
             </form>
           </Tab.Panel>
           <Tab.Panel>
-            <form>
+            <form onSubmit={handleAddTeacherSubmit}>
               <RowInput
                 label="First Name"
                 inputValue={teacher.firstName}
