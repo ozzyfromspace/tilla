@@ -95,6 +95,10 @@ func (api *CalendarApi) createExcel() {
 		for k, v := range droppedEventsMap {
 			fmt.Printf("Student - %v (%v):\n\n", (*v)[0].Student, k)
 
+			if *v == nil {
+				continue
+			}
+
 			for i, v2 := range *v {
 				y, m, d := v2.Date.Date()
 				datetimeStr := fmt.Sprintf("%v %02d, %04v starting at %02d:%02d", m, d, y, v2.Date.Hour(), v2.Date.Minute())

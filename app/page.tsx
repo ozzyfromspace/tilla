@@ -14,6 +14,7 @@ import {
   SetStateAction,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -41,9 +42,10 @@ function toFullName(studentId: StudentId): string {
   return `${studentId.firstName} ${studentId.lastName}`;
 }
 
-function toBasicISO(date: Date, start: boolean): string {
-  const time = start ? '00:00:00Z' : '23:59:59Z';
-  return `${date.toISOString().split('T')}T${time}`;
+function toBasicISO(date: Date): string {
+  const parts = date.toISOString().split('T');
+  const timepart = `${parts[1].split('.')[0]}Z`;
+  return `${parts[0]}T${timepart}`;
 }
 
 const BASE_URL = 'http://localhost:8080';
@@ -260,7 +262,7 @@ const Home = () => {
 
     axios.post(`${BASE_URL}/student/subjects`, payload).then((resp) => {
       if (resp.status === 201) {
-        setSubjectRows(() => [])
+        setSubjectRows(() => []);
       }
     });
   }
@@ -331,6 +333,39 @@ const Home = () => {
           nickname: '',
           calendarId: '',
         }));
+      }
+    });
+  };
+
+  const [dynamicLink, setDynamicLink] = useState(() => '');
+  const linkRef = useRef<HTMLAnchorElement | null>(null);
+
+  const handleDownloadRequest = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    interface Payload {
+      minLocalTime: string;
+      maxLocalTime: string;
+    }
+
+    interface GoResponse {
+      filename: string;
+      msg: string;
+    }
+
+    const payload: Payload = {
+      minLocalTime: toBasicISO(startDate),
+      maxLocalTime: toBasicISO(endDate),
+    };
+
+    axios.post<GoResponse>(`${BASE_URL}/excel`, payload).then((resp) => {
+      if (resp.status === 201) {
+        // celebrate!
+        console.log(resp.data);
+        setDynamicLink(() => `${BASE_URL}/excel/${resp.data.filename}`);
+        setTimeout(() => {
+          linkRef.current?.click();
+        }, 10);
       }
     });
   };
@@ -424,24 +459,31 @@ const Home = () => {
             </form>
           </Tab.Panel>
           <Tab.Panel>
-            <RowDatePicker
-              label="Start Date"
-              selectedDate={startDate}
-              setSelectedDate={handleDateSelection(setStartDate, endDate, true)}
-            />
-            <RowDatePicker
-              label="End Date"
-              selectedDate={endDate}
-              setSelectedDate={handleDateSelection(
-                setEndDate,
-                startDate,
-                false
-              )}
-            />
-            <Button label="Download Excel File" />
+            <form onSubmit={handleDownloadRequest}>
+              <RowDatePicker
+                label="Start Date"
+                selectedDate={startDate}
+                setSelectedDate={handleDateSelection(
+                  setStartDate,
+                  endDate,
+                  true
+                )}
+              />
+              <RowDatePicker
+                label="End Date"
+                selectedDate={endDate}
+                setSelectedDate={handleDateSelection(
+                  setEndDate,
+                  startDate,
+                  false
+                )}
+              />
+              <Button label="Download Excel File" />
+            </form>
           </Tab.Panel>
         </Tab.Panels>
       </Tab.Group>
+      <a href={dynamicLink} ref={linkRef}></a>
     </div>
   );
 };
