@@ -113,7 +113,7 @@ const AddStudentForm = () => {
         placeholder="id@marvel.com"
       />
       <div className="flex justify-center items-center pt-6">
-        <Button label="Add Student" />
+        <Button label="Add Student" selected />
       </div>
     </form>
   );

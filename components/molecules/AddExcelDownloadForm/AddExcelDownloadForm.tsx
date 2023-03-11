@@ -151,7 +151,7 @@ const AddExcelDownloadForm = () => {
           )}
         />
         <div className="flex justify-center items-center">
-          <Button label="Download Excel File" />
+          <Button label="Download Excel File" selected />
         </div>
       </form>
       <a href={dynamicLink} ref={linkRef}></a>

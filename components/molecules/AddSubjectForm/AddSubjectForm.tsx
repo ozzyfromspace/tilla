@@ -154,11 +154,13 @@ const AddSubjectForm = () => {
           label="New Subject"
           type="button"
           onClick={handleCreateSubjectRow(setSubjectRows)}
+          selected={false}
         />
         <Button
           label="Save"
           type="submit"
           onClick={() => console.log(subjectRows, selectedStudent)}
+          selected
         />
       </div>
       <SubjectRowGrid
