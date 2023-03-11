@@ -1,6 +1,8 @@
 import { useId } from 'react';
 import DatePicker from 'react-datepicker';
 
+import 'react-datepicker/dist/react-datepicker.css';
+
 interface Props {
   label: string;
   selectedDate: Date;
@@ -13,12 +15,15 @@ const RowDatePicker = (props: Props) => {
   const datePickerId = `date-picker-${id}`;
 
   return (
-    <div>
-      <label htmlFor={datePickerId}>{label}</label>
+    <div className="grid grid-cols-[2fr,3fr] gap-2 p-3 bg-slate-100 max-w-sm rounded-md">
+      <label htmlFor={datePickerId} className="text-slate-700 flex">
+        {label}
+      </label>
       <DatePicker
         id={datePickerId}
         selected={selectedDate}
         onChange={(date) => setSelectedDate?.(date ?? new Date())}
+        className="text-slate-700 cursor-pointer"
       />
     </div>
   );

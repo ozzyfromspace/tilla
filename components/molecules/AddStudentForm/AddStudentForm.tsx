@@ -1,15 +1,24 @@
-import { Student, StudentField } from '@/app/page';
 import Button from '@/components/atoms/Button/Button';
 import RowInput from '@/components/atoms/RowInput/RowInput';
 import { BASE_URL } from '@/constants';
+import { useStudents } from '@/hooks';
 import axios from 'axios';
-import { ChangeEvent, Dispatch, FormEvent, SetStateAction } from 'react';
+import {
+  ChangeEvent,
+  Dispatch,
+  FormEvent,
+  SetStateAction,
+  useState,
+} from 'react';
 
-interface Props {
-  fetchStudents: () => Promise<void>;
-  student: Student;
-  setStudent: Dispatch<SetStateAction<Student>>;
+export interface Student {
+  firstName: string;
+  lastName: string;
+  nickname: string;
+  calendarId: string;
 }
+
+export type StudentField = keyof Student;
 
 const handleAddStudentSubmit =
   (
@@ -65,30 +74,43 @@ const handleStudentChange = (
   };
 };
 
-const AddStudentForm = (props: Props) => {
-  const { student, setStudent, fetchStudents } = props;
+const AddStudentForm = () => {
+  const { fetchStudents } = useStudents();
+  const [student, setStudent] = useState<Student>(() => ({
+    firstName: '',
+    lastName: '',
+    nickname: '',
+    calendarId: '',
+  }));
 
   return (
-    <form onSubmit={handleAddStudentSubmit(student, setStudent, fetchStudents)}>
+    <form
+      onSubmit={handleAddStudentSubmit(student, setStudent, fetchStudents)}
+      className="space-y-2"
+    >
       <RowInput
         label="First Name"
         inputValue={student.firstName}
         handleChange={handleStudentChange('firstName', setStudent)}
+        placeholder="Toby"
       />
       <RowInput
         label="Last Name"
         inputValue={student.lastName}
         handleChange={handleStudentChange('lastName', setStudent)}
+        placeholder="Maguire"
       />
       <RowInput
         label="Nickname"
         inputValue={student.nickname}
         handleChange={handleStudentChange('nickname', setStudent)}
+        placeholder="spidey"
       />
       <RowInput
         label="Calendar Id"
         inputValue={student.calendarId}
         handleChange={handleStudentChange('calendarId', setStudent)}
+        placeholder="id@marvel.com"
       />
       <Button label="Add Student" />
     </form>

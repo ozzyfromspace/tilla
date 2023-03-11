@@ -4,21 +4,26 @@ interface Props {
   label: string;
   handleChange: (e: ChangeEvent<HTMLInputElement>) => void;
   inputValue: string;
+  placeholder?: string;
 }
 
 const RowInput = (props: Props) => {
-  const { label, inputValue, handleChange } = props;
+  const { label, inputValue, handleChange, placeholder } = props;
   const id = useId();
   const inputId = `rowInput${id}`;
 
   return (
-    <div>
-      <label htmlFor={inputId}>{label}</label>
+    <div className="grid grid-cols-[1fr,3fr] gap-2 p-3 bg-slate-100 max-w-sm rounded-md">
+      <label htmlFor={inputId} className="text-slate-700">
+        {label}
+      </label>
       <input
         type="text"
         id={inputId}
         onChange={handleChange}
         value={inputValue}
+        className="text-slate-900 w-full bg-slate-50"
+        placeholder={placeholder ?? 'Enter Value'}
       />
     </div>
   );

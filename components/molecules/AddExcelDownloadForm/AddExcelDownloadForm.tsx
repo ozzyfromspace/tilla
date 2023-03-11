@@ -7,13 +7,9 @@ import {
   FormEvent,
   MutableRefObject,
   SetStateAction,
+  useRef,
   useState,
 } from 'react';
-
-interface Props {
-  setDynamicLink: Dispatch<SetStateAction<string>>;
-  linkRef: MutableRefObject<HTMLAnchorElement | null>;
-}
 
 function toBasicISO(date: Date): string {
   const parts = date.toISOString().split('T');
@@ -104,8 +100,9 @@ const handleDateSelection = (
   };
 };
 
-const AddExcelDownloadForm = (props: Props) => {
-  const { setDynamicLink, linkRef } = props;
+const AddExcelDownloadForm = () => {
+  const [dynamicLink, setDynamicLink] = useState(() => '');
+  const linkRef = useRef<HTMLAnchorElement | null>(null);
 
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
@@ -122,39 +119,41 @@ const AddExcelDownloadForm = (props: Props) => {
     return d;
   });
 
-  console.log('start', startDate, 'end', endDate);
-
   return (
-    <form
-      onSubmit={handleDownloadRequest(
-        startDate,
-        endDate,
-        setDynamicLink,
-        linkRef
-      )}
-    >
-      <RowDatePicker
-        label="Start Date"
-        selectedDate={startDate}
-        setSelectedDate={handleDateSelection(
-          setStartDate,
-          setEndDate,
-          endDate,
-          true
-        )}
-      />
-      <RowDatePicker
-        label="End Date"
-        selectedDate={endDate}
-        setSelectedDate={handleDateSelection(
-          setEndDate,
-          setStartDate,
+    <div>
+      <form
+        onSubmit={handleDownloadRequest(
           startDate,
-          false
+          endDate,
+          setDynamicLink,
+          linkRef
         )}
-      />
-      <Button label="Download Excel File" />
-    </form>
+        className="flex gap-2 flex-wrap"
+      >
+        <RowDatePicker
+          label="Start Date"
+          selectedDate={startDate}
+          setSelectedDate={handleDateSelection(
+            setStartDate,
+            setEndDate,
+            endDate,
+            true
+          )}
+        />
+        <RowDatePicker
+          label="End Date"
+          selectedDate={endDate}
+          setSelectedDate={handleDateSelection(
+            setEndDate,
+            setStartDate,
+            startDate,
+            false
+          )}
+        />
+        <Button label="Download Excel File" />
+      </form>
+      <a href={dynamicLink} ref={linkRef}></a>
+    </div>
   );
 };
 

@@ -1,7 +1,7 @@
-import { StudentId } from '@/app/page';
 import Button from '@/components/atoms/Button/Button';
 import { SubjectRowProps } from '@/components/atoms/SubjectRow/SubjectRow';
 import { BASE_URL } from '@/constants';
+import { StudentId, useStudents } from '@/hooks';
 import { Combobox } from '@headlessui/react';
 import axios from 'axios';
 import { Dispatch, MouseEvent, SetStateAction, useState } from 'react';
@@ -14,16 +14,16 @@ function toFullName(studentId: StudentId): string {
 
 const handleSetSelectedPersonId =
   (
-    studentIds: StudentId[],
-    setSelectedPersonId: Dispatch<SetStateAction<StudentId>>
+    studentDataSlice: StudentId[],
+    setSelectedStudent: Dispatch<SetStateAction<StudentId>>
   ) =>
   (fieldName: string) => {
-    for (let i = 0; i < studentIds.length; i++) {
-      console.log('in loop', i, studentIds, studentIds[0]);
-      const studentName = toFullName(studentIds[i]);
+    for (let i = 0; i < studentDataSlice.length; i++) {
+      console.log('in loop', i, studentDataSlice, studentDataSlice[0]);
+      const studentName = toFullName(studentDataSlice[i]);
 
       if (studentName === fieldName) {
-        setSelectedPersonId(() => studentIds[i]);
+        setSelectedStudent(() => studentDataSlice[i]);
         return;
       }
     }
@@ -54,7 +54,7 @@ const submitSubjects =
   (
     subjectRows: SubjectRowProps[],
     setSubjectRows: Dispatch<SetStateAction<SubjectRowProps[]>>,
-    selectedPersonId: StudentId
+    selectedStudent: StudentId
   ) =>
   (e: MouseEvent<HTMLFormElement, globalThis.MouseEvent>) => {
     interface Subject {
@@ -68,11 +68,11 @@ const submitSubjects =
     }
 
     e.preventDefault();
-    if (!selectedPersonId.id) {
+    if (!selectedStudent.id) {
       console.log('no student id');
       return;
     } else {
-      console.log('made it!', selectedPersonId);
+      console.log('made it!', selectedStudent);
     }
 
     function coerse(si: SubjectRowProps[]): Subject[] {
@@ -93,7 +93,7 @@ const submitSubjects =
     }
 
     const payload: Payload = {
-      studentId: selectedPersonId.id,
+      studentId: selectedStudent.id,
       subjects: coerse(subjectRows),
     };
 
@@ -109,28 +109,17 @@ const submitSubjects =
     });
   };
 
-interface Props {
-  subjectRows: SubjectRowProps[];
-  setSubjectRows: Dispatch<SetStateAction<SubjectRowProps[]>>;
-  studentIds: StudentId[];
-  selectedPersonId: StudentId;
-  setSelectedPersonId: Dispatch<SetStateAction<StudentId>>;
-}
+const AddSubjectForm = () => {
+  const { selectedStudent, setSelectedStudent, studentDataSlice } =
+    useStudents();
 
-const AddSubjectForm = (props: Props) => {
-  const {
-    studentIds,
-    subjectRows,
-    setSubjectRows,
-    selectedPersonId,
-    setSelectedPersonId,
-  } = props;
   const [query, setQuery] = useState('');
+  const [subjectRows, setSubjectRows] = useState<SubjectRowProps[]>(() => []);
 
   const filteredPeople =
     query === ''
-      ? studentIds
-      : studentIds.filter((studentId) => {
+      ? studentDataSlice
+      : studentDataSlice.filter((studentId) => {
           return toFullName(studentId)
             .toLowerCase()
             .includes(query.toLowerCase());
@@ -138,34 +127,43 @@ const AddSubjectForm = (props: Props) => {
 
   return (
     <form
-      onSubmit={submitSubjects(subjectRows, setSubjectRows, selectedPersonId)}
+      onSubmit={submitSubjects(subjectRows, setSubjectRows, selectedStudent)}
     >
-      <Combobox
-        value={toFullName(selectedPersonId)}
-        onChange={handleSetSelectedPersonId(studentIds, setSelectedPersonId)}
-      >
-        <Combobox.Input onChange={(event) => setQuery(event.target.value)} />
-        <Combobox.Options>
-          {filteredPeople.map((person) => (
-            <Combobox.Option key={person.id} value={toFullName(person)}>
-              {toFullName(person)}
-            </Combobox.Option>
-          ))}
-        </Combobox.Options>
-      </Combobox>
-      <Button
-        label="New Subject"
-        type="button"
-        onClick={handleCreateSubjectRow(setSubjectRows)}
-      />
+      <div className="flex justify-between gap-3 p-3 bg-slate-100 max-w-lg rounded-md">
+        <Combobox
+          value={toFullName(selectedStudent)}
+          onChange={handleSetSelectedPersonId(
+            studentDataSlice,
+            setSelectedStudent
+          )}
+        >
+          <Combobox.Input
+            onChange={(event) => setQuery(event.target.value)}
+            className="flex-1"
+            placeholder="Select Student"
+          />
+          <Combobox.Options>
+            {filteredPeople.map((person) => (
+              <Combobox.Option key={person.id} value={toFullName(person)}>
+                {toFullName(person)}
+              </Combobox.Option>
+            ))}
+          </Combobox.Options>
+        </Combobox>
+        <Button
+          label="New Subject"
+          type="button"
+          onClick={handleCreateSubjectRow(setSubjectRows)}
+        />
+        <Button
+          label="Save"
+          type="submit"
+          onClick={() => console.log(subjectRows, selectedStudent)}
+        />
+      </div>
       <SubjectRowGrid
         subjectRows={subjectRows}
         setSubjectRows={setSubjectRows}
-      />
-      <Button
-        label="Save"
-        type="submit"
-        onClick={() => console.log(subjectRows, selectedPersonId)}
       />
     </form>
   );

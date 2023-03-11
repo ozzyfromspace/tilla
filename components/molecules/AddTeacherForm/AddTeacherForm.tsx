@@ -1,14 +1,22 @@
-import { Teacher, TeacherField } from '@/app/page';
 import Button from '@/components/atoms/Button/Button';
 import RowInput from '@/components/atoms/RowInput/RowInput';
 import { BASE_URL } from '@/constants';
 import axios from 'axios';
-import { ChangeEvent, Dispatch, FormEvent, SetStateAction } from 'react';
+import {
+  ChangeEvent,
+  Dispatch,
+  FormEvent,
+  SetStateAction,
+  useState,
+} from 'react';
 
-interface Props {
-  teacher: Teacher;
-  setTeacher: Dispatch<SetStateAction<Teacher>>;
+export interface Teacher {
+  firstName: string;
+  lastName: string;
+  nickname: string;
 }
+
+export type TeacherField = keyof Teacher;
 
 const handleAddTeacherSubmit =
   (teacher: Teacher, setTeacher: Dispatch<SetStateAction<Teacher>>) =>
@@ -52,11 +60,18 @@ const handleTeacherChange = (
   };
 };
 
-const AddTeacherForm = (props: Props) => {
-  const { teacher, setTeacher } = props;
+const AddTeacherForm = () => {
+  const [teacher, setTeacher] = useState<Teacher>(() => ({
+    firstName: '',
+    lastName: '',
+    nickname: '',
+  }));
 
   return (
-    <form onSubmit={handleAddTeacherSubmit(teacher, setTeacher)}>
+    <form
+      onSubmit={handleAddTeacherSubmit(teacher, setTeacher)}
+      className="space-y-2"
+    >
       <RowInput
         label="First Name"
         inputValue={teacher.firstName}

@@ -88,7 +88,7 @@ const SubjectRowGrid = (props: Props) => {
   );
 
   return (
-    <div>
+    <div className="mt-3 space-y-3">
       {subjectRows.map(({ id, ...rest }, index) => {
         return (
           <SubjectRow
