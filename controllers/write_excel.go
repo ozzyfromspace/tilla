@@ -14,7 +14,7 @@ type ConversionDoc struct {
 	Events  models.Events
 }
 
-func generateExcel(convDoc *[]ConversionDoc, month time.Month, year int) (string, error) {
+func generateExcel(convDoc *[]ConversionDoc, startDay int, startMonth time.Month, startYear int, endDay int, endMonth time.Month, endYear int) (string, error) {
 	f := excelize.NewFile()
 	defer func() {
 		if err := f.Close(); err != nil {
@@ -40,7 +40,6 @@ func generateExcel(convDoc *[]ConversionDoc, month time.Month, year int) (string
 			return "", err
 		}
 
-		// create headers:
 		f.SetCellValue(sheetName, "A1", "Course")
 		f.SetCellValue(sheetName, "B1", "Teacher")
 		f.SetCellValue(sheetName, "C1", "Date")
@@ -58,18 +57,30 @@ func generateExcel(convDoc *[]ConversionDoc, month time.Month, year int) (string
 			f.SetCellValue(sheetName, coordinate(5, i+1), event.Fee)
 			f.SetCellValue(sheetName, coordinate(6, i+1), event.PaymentStatus)
 		}
+
+		formulaSum := fmt.Sprintf("=SUM(F2:F%d)", len(events)+1)
+		formulaAverage := fmt.Sprintf("=AVERAGE(F2:F%d)", len(events)+1)
+
+		f.SetCellValue(sheetName, fmt.Sprintf("E%d", len(events)+3), "Total")
+		f.SetCellValue(sheetName, fmt.Sprintf("E%d", len(events)+4), "Average")
+
+		f.SetCellFormula(sheetName, fmt.Sprintf("F%d", len(events)+3), formulaSum)
+		f.SetCellFormula(sheetName, fmt.Sprintf("F%d", len(events)+4), formulaAverage)
+
 		if ci == 0 {
 			f.SetActiveSheet(index)
+			if err := f.DeleteSheet("Sheet1"); err != nil {
+				log.Println(err)
+			}
 		}
 	}
 
-	filename := fmt.Sprintf("EclipseAcademy_%02v_%04v.xlsx", month, year)
+	filename := fmt.Sprintf("SL_%02v-%02v-%04v_%02v-%02v-%04v.xlsx", startDay, int(startMonth), startYear, endDay, int(endMonth), endYear)
 	if err := f.SaveAs(filename); err != nil {
 		fmt.Println(err)
 		return "", err
 	}
 
-	// return fmt.Sprintf("./%v", filename), nil
 	return filename, nil
 }
 

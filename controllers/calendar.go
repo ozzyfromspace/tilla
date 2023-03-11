@@ -178,11 +178,21 @@ func formatSubject(str string) string {
 
 func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (string, map[string]*[]DroppedEvent, error) {
 	timeLayout := "2006-01-02T15:04:05-07:00"
-	t, err := time.Parse(timeLayout, minLocalTime)
+	tmin, err := time.Parse(timeLayout, minLocalTime)
 
 	if err != nil {
 		alternativeTimeLayout := "2006-01-02T15:04:05Z"
-		t, err = time.Parse(alternativeTimeLayout, minLocalTime)
+		tmin, err = time.Parse(alternativeTimeLayout, minLocalTime)
+
+		if err != nil {
+			return "", nil, err
+		}
+	}
+	tmax, err := time.Parse(timeLayout, maxLocalTime)
+
+	if err != nil {
+		alternativeTimeLayout := "2006-01-02T15:04:05Z"
+		tmax, err = time.Parse(alternativeTimeLayout, maxLocalTime)
 
 		if err != nil {
 			return "", nil, err
@@ -218,7 +228,7 @@ func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (string, map[str
 		convDoc = append(convDoc, newConversionDoc)
 	}
 
-	filepath, err := generateExcel(&convDoc, t.Month(), t.Year())
+	filepath, err := generateExcel(&convDoc, tmin.Day(), tmin.Month(), tmin.Year(), tmax.Day(), tmax.Month(), tmax.Year())
 
 	return filepath, droppedEventsMap, err
 }

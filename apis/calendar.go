@@ -84,7 +84,8 @@ func (api *CalendarApi) createExcel() {
 
 		localTimes.sort()
 		cal := controllers.NewCalendar(api.db)
-		filepath, droppedEventsMap, err := cal.ToExcel(localTimes.MinLocalTime, localTimes.MaxLocalTime)
+		filepath, _, err := cal.ToExcel(localTimes.MinLocalTime, localTimes.MaxLocalTime)
+		// filepath, droppedEventsMap, err := cal.ToExcel(localTimes.MinLocalTime, localTimes.MaxLocalTime)
 
 		if err != nil {
 			log.Print(err)
@@ -92,21 +93,21 @@ func (api *CalendarApi) createExcel() {
 			return
 		}
 
-		for k, v := range droppedEventsMap {
-			fmt.Printf("Student - %v (%v):\n\n", (*v)[0].Student, k)
-
-			if *v == nil {
-				continue
-			}
-
-			for i, v2 := range *v {
-				y, m, d := v2.Date.Date()
-				datetimeStr := fmt.Sprintf("%v %02d, %04v starting at %02d:%02d", m, d, y, v2.Date.Hour(), v2.Date.Minute())
-				fmt.Printf("\t%5d. %v on %v\n\n", i+1, v2.Summary, datetimeStr)
-			}
-
-			fmt.Printf("\n\n")
-		}
+		// 		for k, v := range droppedEventsMap {
+		// 			if *v == nil {
+		// 				continue
+		// 			}
+		//
+		// 			fmt.Printf("Student - %v (%v):\n\n", (*v)[0].Student, k)
+		//
+		// 			for i, v2 := range *v {
+		// 				y, m, d := v2.Date.Date()
+		// 				datetimeStr := fmt.Sprintf("%v %02d, %04v starting at %02d:%02d", m, d, y, v2.Date.Hour(), v2.Date.Minute())
+		// 				fmt.Printf("\t%5d. %v on %v\n\n", i+1, v2.Summary, datetimeStr)
+		// 			}
+		//
+		// 			fmt.Printf("\n\n")
+		// 		}
 
 		c.JSON(http.StatusCreated, gin.H{
 			"msg":      "excel created!",
