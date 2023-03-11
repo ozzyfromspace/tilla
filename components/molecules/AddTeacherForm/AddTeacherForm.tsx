@@ -87,7 +87,9 @@ const AddTeacherForm = () => {
         inputValue={teacher.nickname}
         handleChange={handleTeacherChange('nickname', setTeacher)}
       />
-      <Button label="Add Teacher" />
+      <div className="flex justify-center items-center pt-6">
+        <Button label="Add Teacher" />
+      </div>
     </form>
   );
 };

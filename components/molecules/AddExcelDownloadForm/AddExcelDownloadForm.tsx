@@ -128,7 +128,7 @@ const AddExcelDownloadForm = () => {
           setDynamicLink,
           linkRef
         )}
-        className="flex gap-2 flex-wrap"
+        className="flex gap-2 justify-center flex-wrap w-fit"
       >
         <RowDatePicker
           label="Start Date"
@@ -150,7 +150,9 @@ const AddExcelDownloadForm = () => {
             false
           )}
         />
-        <Button label="Download Excel File" />
+        <div className="flex justify-center items-center">
+          <Button label="Download Excel File" />
+        </div>
       </form>
       <a href={dynamicLink} ref={linkRef}></a>
     </div>

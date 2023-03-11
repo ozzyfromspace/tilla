@@ -112,7 +112,9 @@ const AddStudentForm = () => {
         handleChange={handleStudentChange('calendarId', setStudent)}
         placeholder="id@marvel.com"
       />
-      <Button label="Add Student" />
+      <div className="flex justify-center items-center pt-6">
+        <Button label="Add Student" />
+      </div>
     </form>
   );
 };
