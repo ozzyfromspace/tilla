@@ -16,7 +16,7 @@ const TabControls = () => {
       </Tab>
       <Tab>
         {({ selected }) => (
-          <FauxButton label="Add Subject" selected={selected} />
+          <FauxButton label="Add Course" selected={selected} />
         )}
       </Tab>
       <Tab>

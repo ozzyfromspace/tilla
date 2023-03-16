@@ -85,7 +85,7 @@ func (dba *Database) AddSubjects(subjectPayload SubjectPayload) error {
 	studentSubjects := student.Subjects
 
 	for _, subject := range subjectPayload.Subjects {
-		studentSubjects[subject.Name] = subject.PricePerHour
+		studentSubjects[subject.Name] = SessionData{PricePerSession: subject.PricePerSession, SessionLengthInMinutes: subject.SessionLengthInMinutes}
 	}
 
 	studentCollection := dba.db.Collection(StudentsCollection)
@@ -96,7 +96,7 @@ func (dba *Database) AddSubjects(subjectPayload SubjectPayload) error {
 		return err
 	}
 
-	var lowercaseSubjects = make(map[string]float64)
+	var lowercaseSubjects = make(map[string]SessionData)
 
 	for k, v := range studentSubjects {
 		computedKey := ComputeSubjectName(k)

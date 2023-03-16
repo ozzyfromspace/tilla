@@ -13,7 +13,7 @@ const RowInput = (props: Props) => {
   const inputId = `rowInput${id}`;
 
   return (
-    <div className="grid grid-cols-[1fr,3fr] gap-2 p-3 bg-slate-100 max-w-sm rounded-md">
+    <div className="grid grid-cols-[6rem,3fr] gap-2 p-3 bg-slate-100 w-full max-w-4xl rounded-md">
       <label htmlFor={inputId} className="text-slate-700">
         {label}
       </label>

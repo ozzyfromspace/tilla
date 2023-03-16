@@ -3,8 +3,14 @@ package models
 type SubjectMetaData struct{}
 
 type Subject struct {
-	Name         string  `json:"name"`
-	PricePerHour float64 `json:"pricePerHour" bson:"price,required"`
+	Name                   string  `json:"name"`
+	PricePerSession        float64 `json:"pricePerSession" bson:"pricePerSession,required"`
+	SessionLengthInMinutes int     `json:"sessionLength" bson:"sessionLength,required"`
+}
+
+type SessionData struct {
+	PricePerSession        float64
+	SessionLengthInMinutes int
 }
 
 type SubjectPayload struct {

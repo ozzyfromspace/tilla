@@ -12,17 +12,17 @@ const Home = () => {
   return (
     <div className="flex flex-col bg-[hsl(264,72%,30%)] min-h-screen">
       <div className="flex flex-col justify-start items-center bg-violet-900 w-5/6 max-w-5xl mx-auto flex-1">
-        <Header title="Eclipse Academy" subtitle="Track students & Teachers" />
+        <Header title="Eclipse Academy" subtitle="Track Students & Teachers" />
         <Tab.Group>
           <TabControls />
-          <Tab.Panels className="flex justify-center items-center pt-6">
-            <Tab.Panel>
+          <Tab.Panels className="flex justify-center items-center pt-6 w-full">
+            <Tab.Panel className="w-full">
               <AddStudentForm />
             </Tab.Panel>
-            <Tab.Panel>
+            <Tab.Panel className="w-full">
               <AddTeacherForm />
             </Tab.Panel>
-            <Tab.Panel>
+            <Tab.Panel className="w-full">
               <AddSubjectForm />
             </Tab.Panel>
             <Tab.Panel>

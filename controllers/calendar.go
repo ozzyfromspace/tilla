@@ -91,7 +91,7 @@ func (cal *Calendar) GetEvents(returnedStudent *models.Student, minLocalTime str
 
 		newEvent.DateTime = startTime
 		eventDuration := endTime.Sub(startTime)
-		subject, price, err := cal.getSubjectAndPrice(v.Summary, returnedStudent.Subjects)
+		subjectData, err := cal.getSubjectData(v.Summary, returnedStudent.Subjects)
 
 		if err != nil {
 			*droppedEvents = append(*droppedEvents, DroppedEvent{
@@ -102,11 +102,19 @@ func (cal *Calendar) GetEvents(returnedStudent *models.Student, minLocalTime str
 			continue
 		}
 
-		hourlyDuration := math.Floor(eventDuration.Hours()*100) / 100
+		sessionDuration := math.Floor(eventDuration.Minutes()*100) / 100
 
-		newEvent.Course = formatSubject(subject)
-		newEvent.Fee = price * hourlyDuration
-		newEvent.Duration = fmt.Sprint(hourlyDuration)
+		_safeSessionLength := subjectData.SessionLengthInMinutes
+
+		if subjectData.SessionLengthInMinutes <= 0 {
+			_safeSessionLength = 60
+		}
+
+		newEvent.Course = formatSubject(subjectData.SubjectName)
+		newEvent.Fee = subjectData.PricePerSession * sessionDuration / float64(_safeSessionLength)
+		newEvent.Duration = fmt.Sprint(sessionDuration)
+		newEvent.Rate = subjectData.PricePerSession
+		newEvent.SessionLengthInMinutes = subjectData.SessionLengthInMinutes
 		newEvent.Date = getDateString(&startTime)
 		newEvent.PaymentStatus = PaymentStatus
 
@@ -138,7 +146,13 @@ func (cal *Calendar) getTeacher(summaryStr string) (*models.Teacher, error) {
 	return cal.db.GetTeacherByNickname(strings.Trim(teacherNickname, " "))
 }
 
-func (cal *Calendar) getSubjectAndPrice(summaryStr string, subjects map[string]float64) (string, float64, error) {
+type subjectDataResponse struct {
+	SubjectName            string
+	PricePerSession        float64
+	SessionLengthInMinutes int
+}
+
+func (cal *Calendar) getSubjectData(summaryStr string, subjects map[string]models.SessionData) (subjectDataResponse, error) {
 	str := summaryStr
 
 	if strings.Contains(summaryStr, " - ") {
@@ -146,13 +160,15 @@ func (cal *Calendar) getSubjectAndPrice(summaryStr string, subjects map[string]f
 	}
 
 	str = models.ComputeSubjectName(str)
-	price, ok := subjects[str]
+	sessionData, ok := subjects[str]
 
 	if !ok {
-		return "", 0, errors.New("could not find subject")
+		// return subjectDataResponse{}, errors.New("could not find subject")
+		return subjectDataResponse{"", 0, 0}, errors.New("could not find subject")
 	}
 
-	return str, price, nil
+	// return str, price, nil
+	return subjectDataResponse{SubjectName: str, PricePerSession: sessionData.PricePerSession, SessionLengthInMinutes: sessionData.SessionLengthInMinutes}, nil
 }
 
 func getDateString(datetime *time.Time) string {

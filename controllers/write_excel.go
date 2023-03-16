@@ -47,6 +47,8 @@ func generateExcel(convDoc *[]ConversionDoc, startDay int, startMonth time.Month
 		f.SetCellValue(sheetName, "E1", "Duration")
 		f.SetCellValue(sheetName, "F1", "Fee")
 		f.SetCellValue(sheetName, "G1", "Payment Status")
+		f.SetCellValue(sheetName, "H1", "Rate ($/Session)")
+		f.SetCellValue(sheetName, "I1", "Session Length")
 
 		for i, event := range events {
 			f.SetCellValue(sheetName, coordinate(0, i+1), event.Course)
@@ -56,6 +58,8 @@ func generateExcel(convDoc *[]ConversionDoc, startDay int, startMonth time.Month
 			f.SetCellValue(sheetName, coordinate(4, i+1), event.Duration)
 			f.SetCellValue(sheetName, coordinate(5, i+1), event.Fee)
 			f.SetCellValue(sheetName, coordinate(6, i+1), event.PaymentStatus)
+			f.SetCellValue(sheetName, coordinate(7, i+1), event.Rate)
+			f.SetCellValue(sheetName, coordinate(8, i+1), event.SessionLengthInMinutes)
 		}
 
 		formulaSum := fmt.Sprintf("=SUM(F2:F%d)", len(events)+1)

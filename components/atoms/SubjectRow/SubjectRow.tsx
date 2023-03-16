@@ -1,26 +1,39 @@
 import { ChangeEvent, useId } from 'react';
 
+export type FieldName =
+  | 'course-name'
+  | 'price-per-session'
+  | 'session-length-in-minutes';
+
 export interface SubjectRowProps {
-  fieldName: string;
-  price: string;
+  courseName: string;
+  pricePerSession: string;
+  sessionLength: string;
   id: string;
   rowIndex: number;
   handleDelete: (rowId: string) => void;
   handleFieldChange?: (
     rowId: string,
-    fieldName: 'fieldName' | 'price'
+    fieldName: FieldName
   ) => (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 const SubjectRow = (props: SubjectRowProps) => {
-  const { fieldName, price, handleDelete, rowIndex, handleFieldChange, id } =
-    props;
+  const {
+    courseName,
+    pricePerSession,
+    sessionLength,
+    handleDelete,
+    rowIndex,
+    handleFieldChange,
+    id,
+  } = props;
   const _id = useId();
   const inputname_id = `inputname-${_id}`;
   const inputprice_id = `inputprice-${_id}`;
 
   return (
-    <div className="flex justify-start items-center gap-3 p-3 bg-slate-100 text-slate-700 rounded-md max-w-lg">
+    <div className="flex justify-start items-center gap-3 p-3 bg-slate-100 text-slate-700 rounded-md">
       <span className="flex gap-1 w-4">
         <p>{rowIndex + 1}</p>
         <p>.</p>
@@ -30,12 +43,12 @@ const SubjectRow = (props: SubjectRowProps) => {
       </label>
       <input
         type="text"
-        value={fieldName}
+        value={courseName}
         onChange={(e) => {
           e.preventDefault();
           e.stopPropagation();
 
-          handleFieldChange?.(id, 'fieldName')(e);
+          handleFieldChange?.(id, 'course-name')(e);
         }}
         id={inputname_id}
         placeholder="Subject"
@@ -46,15 +59,32 @@ const SubjectRow = (props: SubjectRowProps) => {
           Enter price
         </label>
         <span>
-          <p>$</p>
+          <p>($/Session)</p>
         </span>
         <input
           type="text"
-          value={price}
-          onChange={handleFieldChange?.(id, 'price')}
-          className="text-slate-900 w-full"
+          value={pricePerSession}
+          onChange={handleFieldChange?.(id, 'price-per-session')}
+          className="text-slate-900 w-14"
           id={inputprice_id}
-          placeholder="Price"
+          placeholder="60"
+        />
+      </div>
+      <div className="flex gap-1 w-1/3">
+        <label htmlFor={inputprice_id} className="sr-only">
+          Session Length in Minutes
+        </label>
+        <span>
+          <p>(minutes/Session)</p>
+        </span>
+        <input
+          type="number"
+          min={0}
+          value={sessionLength}
+          onChange={handleFieldChange?.(id, 'session-length-in-minutes')}
+          className="text-slate-900 w-14"
+          id={inputprice_id}
+          placeholder="Price per session"
         />
       </div>
       <button onClick={() => handleDelete(id)} aria-label="Delete Row">

@@ -3,15 +3,17 @@ package models
 import "time"
 
 type Event struct {
-	StudentName   string
-	Course        string
-	Teacher       string
-	Date          string
-	DateTime      time.Time
-	Time          string
-	Duration      string
-	Fee           float64
-	PaymentStatus string
+	StudentName            string
+	Course                 string
+	Teacher                string
+	Date                   string
+	DateTime               time.Time
+	Rate                   float64
+	SessionLengthInMinutes int
+	Time                   string
+	Duration               string
+	Fee                    float64
+	PaymentStatus          string
 }
 
 type Events []Event

@@ -70,7 +70,7 @@ const AddTeacherForm = () => {
   return (
     <form
       onSubmit={handleAddTeacherSubmit(teacher, setTeacher)}
-      className="space-y-2"
+      className="space-y-2 w-full flex flex-col items-center"
     >
       <RowInput
         label="First Name"

@@ -1,4 +1,5 @@
 import SubjectRow, {
+  FieldName,
   SubjectRowProps,
 } from '@/components/atoms/SubjectRow/SubjectRow';
 import { ChangeEvent, Dispatch, SetStateAction, useCallback } from 'react';
@@ -12,7 +13,7 @@ const SubjectRowGrid = (props: Props) => {
   const { subjectRows, setSubjectRows } = props;
 
   const updateSubjectField = useCallback(
-    function (rowId: string, fieldName: 'fieldName' | 'price') {
+    function (rowId: string, fieldName: FieldName) {
       return (e: ChangeEvent<HTMLInputElement>) => {
         setSubjectRows((s) => {
           e.preventDefault();
@@ -33,16 +34,16 @@ const SubjectRowGrid = (props: Props) => {
 
           if (foundIndex == -1) return s;
 
-          if (fieldName === 'fieldName') {
-            copy[foundIndex].fieldName = e.target.value;
+          if (fieldName === 'course-name') {
+            copy[foundIndex].courseName = e.target.value;
           }
 
-          if (fieldName === 'price') {
+          if (fieldName === 'price-per-session') {
             if (
-              !copy[foundIndex].price.includes('.') &&
+              !copy[foundIndex].pricePerSession.includes('.') &&
               e.target.value.endsWith('.')
             ) {
-              copy[foundIndex].price = e.target.value;
+              copy[foundIndex].pricePerSession = e.target.value;
               return copy;
             }
 
@@ -52,7 +53,14 @@ const SubjectRowGrid = (props: Props) => {
               return s;
             }
 
-            copy[foundIndex].price = isNaN(newPrice) ? '' : `${newPrice}`;
+            copy[foundIndex].pricePerSession = isNaN(newPrice)
+              ? ''
+              : `${newPrice}`;
+          }
+
+          if (fieldName === 'session-length-in-minutes') {
+            copy[foundIndex].sessionLength =
+              `${parseInt(e.target.value)}` || '';
           }
 
           return copy;
@@ -88,7 +96,7 @@ const SubjectRowGrid = (props: Props) => {
   );
 
   return (
-    <div className="mt-3 space-y-3 max-h-56 overflow-auto">
+    <div className="mt-3 space-y-3 max-h-56 overflow-auto w-full">
       {subjectRows.map(({ id, ...rest }, index) => {
         return (
           <SubjectRow

@@ -86,7 +86,7 @@ const AddStudentForm = () => {
   return (
     <form
       onSubmit={handleAddStudentSubmit(student, setStudent, fetchStudents)}
-      className="space-y-2"
+      className="space-y-2 w-full flex flex-col items-center"
     >
       <RowInput
         label="First Name"

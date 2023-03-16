@@ -2,10 +2,10 @@ POST http://localhost:8080/student
 Content-Type: application/json
 
 {
-  "firstName": "Trey",
-  "lastName": "Smith",
-  "nickname": "tiger",
-  "calendarId": "qwerty@group.calendar.google.com"
+  "firstName": "Vinayak",
+  "lastName": "Vikram",
+  "nickname": "vinayak",
+  "calendarId": "c_u58usuf85bbch6hjnht6hq01o4@group.calendar.google.com"
 }
 
 ###
@@ -65,6 +65,21 @@ Content-Type: application/json
 }
 
 ###
+POST http://localhost:8080/student/subjects
+Content-Type: application/json
+
+{
+  "studentId": "6412351ee1d7c9535f75536e",
+  "subjects": [
+    {
+      "name": "Physics",
+      "pricePerSession": 60,
+      "sessionLength": 45
+    }
+  ]
+}
+
+###
 GET http://localhost:8080/student/6403e570ffe7eb0ff530105b
 
 ###
@@ -94,6 +109,15 @@ Content-Type: application/json
   "maxLocalTime": "2023-03-11T04:59:59Z"
 }
 
+### - UTC time
+POST http://localhost:8080/excel
+Content-Type: application/json
+
+{
+  "minLocalTime": "2023-03-01T05:00:00Z",
+  "maxLocalTime": "2023-03-31T04:59:59Z"
+}
+
 ###
 GET http://localhost:8080/excel
 
@@ -101,4 +125,4 @@ GET http://localhost:8080/excel
 GET http://localhost:8080/excel/file.xlsx
 
 ###
-GET http://localhost:8080/excel/EclipseAcademy_February_2023.xlsx
+GET http://localhost:8080/excel/SL_01-03-2023_31-03-2023.xlsx"

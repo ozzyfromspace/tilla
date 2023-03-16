@@ -37,12 +37,13 @@ const handleCreateSubjectRow =
 
     const newId = uuidv4();
     const getNewRowProps = (rowIndex: number): SubjectRowProps => ({
-      fieldName: '',
-      price: '',
+      courseName: '',
+      pricePerSession: '',
       rowIndex: rowIndex,
       id: newId,
       handleDelete: () => {},
       handleFieldChange: () => () => {},
+      sessionLength: '60',
     });
 
     setSubjectRows((subs) => {
@@ -59,7 +60,8 @@ const submitSubjects =
   (e: MouseEvent<HTMLFormElement, globalThis.MouseEvent>) => {
     interface Subject {
       name: string;
-      pricePerHour: number;
+      pricePerSession: number;
+      sessionLength: number;
     }
 
     interface Payload {
@@ -79,11 +81,15 @@ const submitSubjects =
       const subs: Subject[] = [];
 
       for (const row of si) {
-        if (!row.fieldName || !row.price) continue;
+        if (!row.courseName || !row.pricePerSession || !row.sessionLength)
+          continue;
 
         const sub: Subject = {
-          name: row.fieldName,
-          pricePerHour: parseFloat(parseFloat(row.price).toFixed(2)),
+          name: row.courseName,
+          pricePerSession: parseFloat(
+            parseFloat(row.pricePerSession).toFixed(2)
+          ),
+          sessionLength: parseInt(row.sessionLength) || 60,
         };
 
         subs.push(sub);
@@ -128,8 +134,9 @@ const AddSubjectForm = () => {
   return (
     <form
       onSubmit={submitSubjects(subjectRows, setSubjectRows, selectedStudent)}
+      className="w-full max-w-4xl mx-auto flex flex-col justify-center items-center"
     >
-      <div className="flex justify-between gap-3 p-3 bg-slate-100 max-w-lg rounded-md">
+      <div className="flex justify-between gap-3 p-3 bg-slate-100 w-full rounded-md flex-1">
         <Combobox
           value={toFullName(selectedStudent)}
           onChange={handleSetSelectedPersonId(
@@ -151,7 +158,7 @@ const AddSubjectForm = () => {
           </Combobox.Options>
         </Combobox>
         <Button
-          label="New Subject"
+          label="New Course"
           type="button"
           onClick={handleCreateSubjectRow(setSubjectRows)}
           selected={false}
