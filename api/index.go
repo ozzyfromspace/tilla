@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"tilla/apis"
 	"tilla/models"
@@ -12,9 +11,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Test(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World from Go!")
-}
+// func Test(w http.ResponseWriter, r *http.Request) {
+// 	fmt.Fprintf(w, "Hello World from Go!")
+// }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 	db := models.NewDatabase()
