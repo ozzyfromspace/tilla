@@ -37,7 +37,12 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	apis.NewCalendarApi(app, db).RegisterApi()
 
 	app.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotImplemented, models.MsgPayload("route not implemented"))
+		payload := gin.H{
+			"msg":  "route not implemented",
+			"path": c.Request.URL.Path,
+		}
+		// c.JSON(http.StatusNotImplemented, models.MsgPayload("route not implemented"))
+		c.JSON(http.StatusNotImplemented, payload)
 	})
 
 	// app.Run(":8080")
