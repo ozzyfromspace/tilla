@@ -28,7 +28,8 @@ import (
 func Handler(w http.ResponseWriter, r *http.Request) {
 	db := models.NewDatabase()
 
-	app := gin.Default()
+	app := gin.New()
+	gin.SetMode(gin.ReleaseMode)
 	app.Use(gzip.Gzip(gzip.DefaultCompression))
 
 	app.Use(cors.New(cors.Config{

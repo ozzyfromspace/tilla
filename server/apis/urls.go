@@ -2,7 +2,8 @@ package apis
 
 import "fmt"
 
-const NextBaseURL = "http://localhost:3000"
+// const NextBaseURL = "http://localhost:3000"
+const NextBaseURL = "http://eclipse-academy.vercel.app"
 
 func extendBase(route string) string {
 	return fmt.Sprintf("%v%v", NextBaseURL, route)
