@@ -32,9 +32,11 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		MaxAge: 12 * time.Hour,
 	}))
 
-	apis.NewStudentApi(app, db).RegisterApi()
-	apis.NewTeacherApi(app, db).RegisterApi()
-	apis.NewCalendarApi(app, db).RegisterApi()
+	apiGroup := app.Group("/api")
+
+	apis.NewStudentApi(apiGroup, db).RegisterApi()
+	apis.NewTeacherApi(apiGroup, db).RegisterApi()
+	apis.NewCalendarApi(apiGroup, db).RegisterApi()
 
 	app.NoRoute(func(c *gin.Context) {
 		payload := gin.H{
@@ -45,6 +47,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		c.JSON(http.StatusNotImplemented, payload)
 	})
 
-	// app.Run(":8080")
+	// apiGroup.Run(":8080")
 	app.ServeHTTP(w, r)
 }

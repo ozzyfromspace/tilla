@@ -9,11 +9,11 @@ import (
 )
 
 type StudentApi struct {
-	r  *gin.Engine
+	r  *gin.RouterGroup
 	db *models.Database
 }
 
-func NewStudentApi(r *gin.Engine, db *models.Database) *StudentApi {
+func NewStudentApi(r *gin.RouterGroup, db *models.Database) *StudentApi {
 	if r == nil {
 		log.Fatal("gin engine cannot be nil")
 	}

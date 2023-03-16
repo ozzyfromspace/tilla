@@ -13,11 +13,11 @@ import (
 )
 
 type CalendarApi struct {
-	r  *gin.Engine
+	r  *gin.RouterGroup
 	db *models.Database
 }
 
-func NewCalendarApi(r *gin.Engine, db *models.Database) *CalendarApi {
+func NewCalendarApi(r *gin.RouterGroup, db *models.Database) *CalendarApi {
 	if r == nil {
 		log.Fatal("gin engine cannot be nil")
 	}
