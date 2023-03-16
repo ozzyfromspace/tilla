@@ -13,7 +13,7 @@ import (
 func Go(w http.ResponseWriter, r *http.Request) {
 	app := gin.Default()
 
-	app.GET("/test", func(ctx *gin.Context) {
+	app.GET("/api/test", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"msg": "test working..."})
 	})
 
