@@ -110,7 +110,7 @@ Content-Type: application/json
 }
 
 ### - UTC time
-POST http://localhost:8080/excel
+POST http://localhost:8080/api/excel
 Content-Type: application/json
 
 {
@@ -126,3 +126,9 @@ GET http://localhost:8080/excel/file.xlsx
 
 ###
 GET http://localhost:8080/excel/SL_01-03-2023_31-03-2023.xlsx"
+
+###
+GET http://localhost:8080/api/excel_files/SL_01-03-2023_31-03-2023.xlsx
+
+###
+GET http://localhost:8080/api/excel?minLocalTime=2023-03-01T05:00:00Z&maxLocalTime=2023-03-31T04:59:59Z

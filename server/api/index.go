@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"log"
 	"net/http"
+	"os"
 	"tilla/apis"
 	"tilla/models"
 	"time"
@@ -32,6 +34,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	gin.SetMode(gin.ReleaseMode)
 	app.Use(gzip.Gzip(gzip.DefaultCompression))
 
+	app.Static("api/excel_files", "./excel_files")
+	app.Static("api/marshmallow", "./marshmallow")
+
 	app.Use(cors.New(cors.Config{
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "User-Agent", "Referrer", "Host", "Token"},
@@ -54,7 +59,37 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	apis.NewCalendarApi(apiGroup, db).RegisterApi()
 
 	app.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotImplemented, models.MsgPayload("route not implemented"))
+		c.JSON(http.StatusNotImplemented, models.MsgPayload("route not implemented - "+c.FullPath()))
+	})
+
+	apiGroup.GET("/test", func(c *gin.Context) {
+		f, err := os.Create("/tmp/sally.txt")
+
+		if err != nil {
+			log.Println("FAILED TO GET TMP FOLDER", err)
+			c.JSON(http.StatusBadRequest, gin.H{"msg": "FAILED TO GET TMP FOLDER"})
+		}
+
+		n, err := f.WriteString("I saved a plane")
+
+		if err != nil {
+			log.Println("FAILED TO GET TMP FOLDER", err, n)
+			c.JSON(http.StatusBadRequest, gin.H{"msg": "FAILED TO WRITE TO TMP FILE"})
+		}
+
+		c.JSON(http.StatusOK, gin.H{"msg": "done"})
+	})
+
+	apiGroup.GET("/read", func(c *gin.Context) {
+		f, err := os.ReadFile("/tmp/sally.txt")
+
+		if err != nil {
+			log.Println("failed to read file from /tmp folder")
+			c.JSON(http.StatusBadRequest, gin.H{"msg": "smh"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"msg": string(f)})
 	})
 
 	app.ServeHTTP(w, r)
