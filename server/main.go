@@ -1,7 +1,9 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"os"
 	"tilla/apis"
 	"tilla/models"
 	"time"
@@ -39,6 +41,13 @@ func main() {
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotImplemented, models.MsgPayload("route not implemented"))
 	})
+
+	f, err := os.Create("sally.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	f.WriteString("Hi, I saved a plane")
 
 	r.Run(":8080")
 }

@@ -63,15 +63,33 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	apiGroup.GET("/test", func(c *gin.Context) {
-		file, err := os.ReadDir("/tmp")
+		f, err := os.Create("/tmp/sally.txt")
 
 		if err != nil {
 			log.Println("FAILED TO GET TMP FOLDER", err)
+			c.JSON(http.StatusBadRequest, gin.H{"msg": "FAILED TO GET TMP FOLDER"})
 		}
 
-		log.Println(file)
+		n, err := f.WriteString("I saved a plane")
+
+		if err != nil {
+			log.Println("FAILED TO GET TMP FOLDER", err, n)
+			c.JSON(http.StatusBadRequest, gin.H{"msg": "FAILED TO WRITE TO TMP FILE"})
+		}
 
 		c.JSON(http.StatusOK, gin.H{"msg": "done"})
+	})
+
+	apiGroup.GET("/read", func(c *gin.Context) {
+		f, err := os.ReadFile("/tmp/sally.txt")
+
+		if err != nil {
+			log.Println("failed to read file from /tmp folder")
+			c.JSON(http.StatusBadRequest, gin.H{"msg": "smh"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"msg": string(f)})
 	})
 
 	app.ServeHTTP(w, r)
