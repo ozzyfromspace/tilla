@@ -127,7 +127,7 @@ func (api *CalendarApi) downloadExcel() {
 			return
 		}
 
-		filename = fmt.Sprintf("tmp/%v", strings.Trim(filename, "/"))
+		filename = fmt.Sprintf("/tmp/%v", strings.Trim(filename, "/"))
 
 		file, err := os.Open(filename)
 
