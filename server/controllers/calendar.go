@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"os"
 	"sort"
 	"strings"
 	"tilla/models"
@@ -193,7 +192,7 @@ func formatSubject(str string) string {
 	return strings.Join(output, " ")
 }
 
-func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (string, *os.File, map[string]*[]DroppedEvent, error) {
+func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (string, map[string]*[]DroppedEvent, error) {
 	timeLayout := "2006-01-02T15:04:05-07:00"
 	tmin, err := time.Parse(timeLayout, minLocalTime)
 
@@ -202,7 +201,7 @@ func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (string, *os.Fil
 		tmin, err = time.Parse(alternativeTimeLayout, minLocalTime)
 
 		if err != nil {
-			return "", nil, nil, err
+			return "", nil, err
 		}
 	}
 	tmax, err := time.Parse(timeLayout, maxLocalTime)
@@ -212,7 +211,7 @@ func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (string, *os.Fil
 		tmax, err = time.Parse(alternativeTimeLayout, maxLocalTime)
 
 		if err != nil {
-			return "", nil, nil, err
+			return "", nil, err
 		}
 	}
 
@@ -220,7 +219,7 @@ func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (string, *os.Fil
 
 	if err != nil {
 		log.Println("could not retrieve students from database")
-		return "", nil, nil, err
+		return "", nil, err
 	}
 
 	convDoc := []ConversionDoc{}
@@ -245,7 +244,7 @@ func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (string, *os.Fil
 		convDoc = append(convDoc, newConversionDoc)
 	}
 
-	filepath, file, err := generateExcel(&convDoc, tmin.Day(), tmin.Month(), tmin.Year(), tmax.Day(), tmax.Month(), tmax.Year())
+	filepath, err := generateExcel(&convDoc, tmin.Day(), tmin.Month(), tmin.Year(), tmax.Day(), tmax.Month(), tmax.Year())
 
-	return filepath, file, droppedEventsMap, err
+	return filepath, droppedEventsMap, err
 }
