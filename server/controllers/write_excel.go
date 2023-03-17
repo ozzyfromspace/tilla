@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"log"
+	"os"
 	"tilla/models"
 	"time"
 
@@ -14,7 +15,7 @@ type ConversionDoc struct {
 	Events  models.Events
 }
 
-func generateExcel(convDoc *[]ConversionDoc, startDay int, startMonth time.Month, startYear int, endDay int, endMonth time.Month, endYear int) (string, error) {
+func generateExcel(convDoc *[]ConversionDoc, startDay int, startMonth time.Month, startYear int, endDay int, endMonth time.Month, endYear int) (string, *os.File, error) {
 	f := excelize.NewFile()
 	defer func() {
 		if err := f.Close(); err != nil {
@@ -37,7 +38,7 @@ func generateExcel(convDoc *[]ConversionDoc, startDay int, startMonth time.Month
 		index, err := f.NewSheet(sheetName)
 		if err != nil {
 			fmt.Println(err)
-			return "", err
+			return "", nil, err
 		}
 
 		f.SetCellValue(sheetName, "A1", "Course")
@@ -82,10 +83,16 @@ func generateExcel(convDoc *[]ConversionDoc, startDay int, startMonth time.Month
 	filename := fmt.Sprintf("excel_files/SL_%02v-%02v-%04v_%02v-%02v-%04v.xlsx", startDay, int(startMonth), startYear, endDay, int(endMonth), endYear)
 	if err := f.SaveAs(filename); err != nil {
 		fmt.Println(err)
-		return "", err
+		return "", nil, err
 	}
 
-	return filename, nil
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Println(err)
+		return "", nil, err
+	}
+
+	return filename, file, nil
 }
 
 func coordinate(offset byte, row int) string {

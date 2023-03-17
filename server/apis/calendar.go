@@ -32,6 +32,7 @@ func NewCalendarApi(r *gin.RouterGroup, db *models.Database) *CalendarApi {
 func (api *CalendarApi) RegisterApi() {
 	api.createExcel()
 	api.downloadExcel()
+	api.getExcel()
 }
 
 type LocalTimes struct {
@@ -84,7 +85,7 @@ func (api *CalendarApi) createExcel() {
 
 		localTimes.sort()
 		cal := controllers.NewCalendar(api.db)
-		filepath, _, err := cal.ToExcel(localTimes.MinLocalTime, localTimes.MaxLocalTime)
+		_, file, _, err := cal.ToExcel(localTimes.MinLocalTime, localTimes.MaxLocalTime)
 		// filepath, droppedEventsMap, err := cal.ToExcel(localTimes.MinLocalTime, localTimes.MaxLocalTime)
 
 		if err != nil {
@@ -109,10 +110,107 @@ func (api *CalendarApi) createExcel() {
 		// 			fmt.Printf("\n\n")
 		// 		}
 
-		c.JSON(http.StatusCreated, gin.H{
-			"msg":      "excel created!",
-			"filename": filepath,
-		})
+		// c.JSON(http.StatusCreated, gin.H{
+		// 	"msg":      "excel created!",
+		// 	"filename": filepath,
+		// })
+
+		// file, err := os.Open(filename)
+
+		if err != nil {
+			log.Print(err)
+			c.JSON(http.StatusBadRequest, models.MsgPayload("could not find excel file"))
+			return
+		}
+
+		fileinfo, err := file.Stat()
+
+		if err != nil {
+			log.Print(err)
+			c.JSON(http.StatusInternalServerError, models.MsgPayload("could not retrieve created excel file stats"))
+			return
+		}
+
+		contentLength := fileinfo.Size()
+		contentType := "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+		contentDisposition := fmt.Sprintf("attachment; filename=\"%s\"", fileinfo.Name())
+
+		extraHeaders := map[string]string{
+			"Content-Disposition": contentDisposition,
+		}
+
+		fmt.Println("MADE IT!")
+		c.DataFromReader(http.StatusOK, contentLength, contentType, file, extraHeaders)
+	})
+}
+
+func (api *CalendarApi) getExcel() {
+	api.r.GET("/excel", func(c *gin.Context) {
+		minLocalTime := c.Query("minLocalTime")
+		maxLocalTime := c.Query("maxLocalTime")
+
+		localTimes := &LocalTimes{
+			MinLocalTime: minLocalTime,
+			MaxLocalTime: maxLocalTime,
+		}
+
+		localTimes.sort()
+		cal := controllers.NewCalendar(api.db)
+		_, file, _, err := cal.ToExcel(localTimes.MinLocalTime, localTimes.MaxLocalTime)
+
+		if err != nil {
+			log.Print(err)
+			c.JSON(http.StatusUnprocessableEntity, models.MsgPayload("failed to create excel file - "+err.Error()))
+			return
+		}
+
+		// 		for k, v := range droppedEventsMap {
+		// 			if *v == nil {
+		// 				continue
+		// 			}
+		//
+		// 			fmt.Printf("Student - %v (%v):\n\n", (*v)[0].Student, k)
+		//
+		// 			for i, v2 := range *v {
+		// 				y, m, d := v2.Date.Date()
+		// 				datetimeStr := fmt.Sprintf("%v %02d, %04v starting at %02d:%02d", m, d, y, v2.Date.Hour(), v2.Date.Minute())
+		// 				fmt.Printf("\t%5d. %v on %v\n\n", i+1, v2.Summary, datetimeStr)
+		// 			}
+		//
+		// 			fmt.Printf("\n\n")
+		// 		}
+
+		// c.JSON(http.StatusCreated, gin.H{
+		// 	"msg":      "excel created!",
+		// 	"filename": filepath,
+		// })
+
+		// file, err := os.Open(filename)
+
+		if err != nil {
+			log.Print(err)
+			c.JSON(http.StatusBadRequest, models.MsgPayload("could not find excel file"))
+			return
+		}
+
+		fileinfo, err := file.Stat()
+
+		if err != nil {
+			log.Print(err)
+			c.JSON(http.StatusInternalServerError, models.MsgPayload("could not retrieve created excel file stats"))
+			return
+		}
+
+		contentLength := fileinfo.Size()
+		contentType := "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+		contentDisposition := fmt.Sprintf("attachment; filename=\"%s\"", fileinfo.Name())
+
+		extraHeaders := map[string]string{
+			"Content-Disposition": contentDisposition,
+		}
+
+		fmt.Println("MADE IT!")
+		c.DataFromReader(http.StatusOK, contentLength, contentType, file, extraHeaders)
 	})
 }
 
