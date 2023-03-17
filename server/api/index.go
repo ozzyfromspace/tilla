@@ -33,6 +33,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	app.Use(gzip.Gzip(gzip.DefaultCompression))
 
 	app.Static("api/excel_files", "./excel_files")
+	app.Static("api/marshmallow", "./marshmallow")
 
 	app.Use(cors.New(cors.Config{
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
