@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 	"tilla/apis"
 	"tilla/models"
 	"time"
@@ -42,12 +41,15 @@ func main() {
 		c.JSON(http.StatusNotImplemented, models.MsgPayload("route not implemented"))
 	})
 
-	f, err := os.Create("sally.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	f.WriteString("Hi, I saved a plane")
+	r.GET("/test/:id", func(c *gin.Context) {
+		newParam, found := c.Params.Get("id")
+		if found {
+			log.Println("Nice! Found the id")
+		} else {
+			log.Println("Could not find ID")
+		}
+		c.JSON(http.StatusOK, gin.H{"msg": "hi", "param": newParam})
+	})
 
 	r.Run(":8080")
 }

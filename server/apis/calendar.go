@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"tilla/controllers"
 	"tilla/models"
 	"time"
@@ -125,6 +126,8 @@ func (api *CalendarApi) downloadExcel() {
 			c.JSON(http.StatusBadRequest, models.MsgPayload("excel filename was not provided"))
 			return
 		}
+
+		filename = fmt.Sprintf("tmp/%v", strings.Trim(filename, "/"))
 
 		file, err := os.Open(filename)
 

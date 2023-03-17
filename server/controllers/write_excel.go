@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"log"
+	"strings"
 	"tilla/models"
 	"time"
 
@@ -79,11 +80,13 @@ func generateExcel(convDoc *[]ConversionDoc, startDay int, startMonth time.Month
 		}
 	}
 
-	filename := fmt.Sprintf("/tmp/SL_%02v-%02v-%04v_%02v-%02v-%04v.xlsx", startDay, int(startMonth), startYear, endDay, int(endMonth), endYear)
+	filename := fmt.Sprintf("tmp/SL_%02v-%02v-%04v_%02v-%02v-%04v.xlsx", startDay, int(startMonth), startYear, endDay, int(endMonth), endYear)
 	if err := f.SaveAs(filename); err != nil {
 		fmt.Println(err)
 		return "", err
 	}
+
+	filename = strings.Join(strings.Split(filename, "/")[1:], "")
 
 	return filename, nil
 }
