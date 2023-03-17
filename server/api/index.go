@@ -32,6 +32,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	gin.SetMode(gin.ReleaseMode)
 	app.Use(gzip.Gzip(gzip.DefaultCompression))
 
+	app.Static("api/excel_files", "./excel_files")
+
 	app.Use(cors.New(cors.Config{
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "User-Agent", "Referrer", "Host", "Token"},
