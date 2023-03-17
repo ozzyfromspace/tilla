@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"log"
 	"net/http"
+	"os"
 	"tilla/apis"
 	"tilla/models"
 	"time"
@@ -58,6 +60,18 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	app.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotImplemented, models.MsgPayload("route not implemented - "+c.FullPath()))
+	})
+
+	apiGroup.GET("/test", func(c *gin.Context) {
+		file, err := os.ReadDir("/tmp")
+
+		if err != nil {
+			log.Println("FAILED TO GET TMP FOLDER", err)
+		}
+
+		log.Println(file)
+
+		c.JSON(http.StatusOK, gin.H{"msg": "done"})
 	})
 
 	app.ServeHTTP(w, r)
