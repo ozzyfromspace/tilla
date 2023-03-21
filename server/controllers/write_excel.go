@@ -83,8 +83,8 @@ func generateExcel(convDoc *[]ConversionDoc, startDay int, startMonth time.Month
 		}
 	}
 
-	// filename := fmt.Sprintf("/tmp/SL_%02v-%02v-%04v_%02v-%02v-%04v.xlsx", int(startMonth), startDay, startYear, int(endMonth), endDay, endYear)
-	filename := fmt.Sprintf("SL_%02v-%02v-%04v_%02v-%02v-%04v.xlsx", int(startMonth), startDay, startYear, int(endMonth), endDay, endYear)
+	filename := fmt.Sprintf("/tmp/SL_%02v-%02v-%04v_%02v-%02v-%04v.xlsx", int(startMonth), startDay, startYear, int(endMonth), endDay, endYear)
+	// filename := fmt.Sprintf("SL_%02v-%02v-%04v_%02v-%02v-%04v.xlsx", int(startMonth), startDay, startYear, int(endMonth), endDay, endYear)
 	if err := f.SaveAs(filename); err != nil {
 		fmt.Println(err)
 		return "", err
