@@ -74,7 +74,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		n, err := f.WriteString("I saved a plane")
 
 		if err != nil {
-			log.Println("FAILED TO GET TMP FOLDER", err, n)
+			log.Println("FAILED TO WRITE TO TMP FOLDER", err, n)
 			c.JSON(http.StatusBadRequest, gin.H{"msg": "FAILED TO WRITE TO TMP FILE"})
 		}
 

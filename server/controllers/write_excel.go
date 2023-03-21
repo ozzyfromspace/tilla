@@ -17,8 +17,6 @@ type ConversionDoc struct {
 }
 
 func generateExcel(convDoc *[]ConversionDoc, startDay int, startMonth time.Month, startYear int, endDay int, endMonth time.Month, endYear int) (string, error) {
-	log.Println("here")
-
 	if len(*convDoc) == 0 {
 		return "", errors.New("no conversion documents were provided")
 	}
@@ -30,9 +28,6 @@ func generateExcel(convDoc *[]ConversionDoc, startDay int, startMonth time.Month
 			return
 		}
 	}()
-
-	// log.Printf("GENERATING EXCELS! %+v, %+v\n", (*convDoc)[0].Student, (*convDoc)[0].Events)
-	log.Println("GENERATING EXCELS!")
 
 	for ci, el := range *convDoc {
 		events := el.Events
@@ -94,8 +89,6 @@ func generateExcel(convDoc *[]ConversionDoc, startDay int, startMonth time.Month
 		fmt.Println(err)
 		return "", err
 	}
-
-	log.Println("filename --", filename)
 
 	splitFilename := strings.Split(filename, "/")
 

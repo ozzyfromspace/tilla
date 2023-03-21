@@ -43,9 +43,7 @@ func main() {
 
 	r.GET("/test/:id", func(c *gin.Context) {
 		newParam, found := c.Params.Get("id")
-		if found {
-			log.Println("Nice! Found the id")
-		} else {
+		if !found {
 			log.Println("Could not find ID")
 		}
 		c.JSON(http.StatusOK, gin.H{"msg": "hi", "param": newParam})

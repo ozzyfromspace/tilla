@@ -37,7 +37,6 @@ func (api *StudentApi) createStudent() {
 		newStudent := models.NewStudent()
 
 		if err := c.BindJSON(newStudent); err != nil {
-			log.Print(err)
 			c.JSON(http.StatusUnprocessableEntity, models.MsgPayload("invalid body, could not parse student"))
 			return
 		}

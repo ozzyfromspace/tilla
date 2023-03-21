@@ -183,8 +183,6 @@ func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (string, map[str
 	timeLayout := "2006-01-02T15:04:05-07:00"
 	tmin, err := time.Parse(timeLayout, minLocalTime)
 
-	log.Println("minLocalTime", minLocalTime)
-
 	if err != nil {
 		alternativeTimeLayout := "2006-01-02T15:04:05Z"
 		tmin, err = time.Parse(alternativeTimeLayout, minLocalTime)
@@ -211,8 +209,6 @@ func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (string, map[str
 		return "", nil, err
 	}
 
-	log.Println(students)
-
 	convDoc := []ConversionDoc{}
 	droppedEventsMap := make(map[string](*[]DroppedEvent))
 
@@ -234,8 +230,6 @@ func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (string, map[str
 
 		convDoc = append(convDoc, newConversionDoc)
 	}
-
-	log.Printf("\n\nCONVDOC: %+v\n\n", convDoc)
 
 	filepath, err := generateExcel(&convDoc, tmin.Day(), tmin.Month(), tmin.Year(), tmax.Day(), tmax.Month(), tmax.Year())
 

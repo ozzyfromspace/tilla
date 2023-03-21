@@ -36,7 +36,6 @@ func (api *TeacherApi) createTeacher() {
 		newTeacher := models.NewTeacher()
 
 		if err := c.BindJSON(newTeacher); err != nil {
-			log.Print(err)
 			c.JSON(http.StatusUnprocessableEntity, models.MsgPayload("invalid body, could not parse teacher"))
 			return
 		}
