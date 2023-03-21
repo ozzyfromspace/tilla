@@ -38,13 +38,15 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	app.Static("api/marshmallow", "./marshmallow")
 
 	app.Use(cors.New(cors.Config{
+		// AllowAllOrigins: ,
+		AllowOrigins:     []string{"https://eclipse-academy.vercel.app", "http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "User-Agent", "Referrer", "Host", "Token"},
-		ExposeHeaders:    []string{"Content-Length", "Content-Type"},
+		ExposeHeaders:    []string{"Content-Length", "Content-Type", "Access-Control-Allow-Origin"},
 		AllowCredentials: true,
-		AllowOriginFunc: func(origin string) bool {
-			return true
-		},
+		// AllowOriginFunc: func(origin string) bool {
+		// 	return true
+		// },
 		MaxAge: 12 * time.Hour,
 	}))
 
