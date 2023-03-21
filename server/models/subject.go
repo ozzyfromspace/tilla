@@ -11,6 +11,7 @@ type Subject struct {
 type SessionData struct {
 	PricePerSession        float64
 	SessionLengthInMinutes int
+	OriginalFilename       string
 }
 
 type SubjectPayload struct {

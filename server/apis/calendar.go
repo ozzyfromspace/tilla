@@ -90,7 +90,7 @@ func (api *CalendarApi) createExcel() {
 
 		if err != nil {
 			log.Print(err)
-			c.JSON(http.StatusUnprocessableEntity, models.MsgPayload("failed to create excel file - "+err.Error()))
+			c.JSON(http.StatusUnprocessableEntity, models.MsgPayload("failed to create excel file -"+err.Error()))
 			return
 		}
 

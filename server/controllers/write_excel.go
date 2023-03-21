@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -16,6 +17,12 @@ type ConversionDoc struct {
 }
 
 func generateExcel(convDoc *[]ConversionDoc, startDay int, startMonth time.Month, startYear int, endDay int, endMonth time.Month, endYear int) (string, error) {
+	log.Println("here")
+
+	if len(*convDoc) == 0 {
+		return "", errors.New("no conversion documents were provided")
+	}
+
 	f := excelize.NewFile()
 	defer func() {
 		if err := f.Close(); err != nil {
@@ -24,7 +31,8 @@ func generateExcel(convDoc *[]ConversionDoc, startDay int, startMonth time.Month
 		}
 	}()
 
-	log.Printf("GENERATING EXCELS! %+v, %+v\n", (*convDoc)[0].Student, (*convDoc)[0].Events)
+	// log.Printf("GENERATING EXCELS! %+v, %+v\n", (*convDoc)[0].Student, (*convDoc)[0].Events)
+	log.Println("GENERATING EXCELS!")
 
 	for ci, el := range *convDoc {
 		events := el.Events
@@ -80,13 +88,20 @@ func generateExcel(convDoc *[]ConversionDoc, startDay int, startMonth time.Month
 		}
 	}
 
-	filename := fmt.Sprintf("/tmp/SL_%02v-%02v-%04v_%02v-%02v-%04v.xlsx", startDay, int(startMonth), startYear, endDay, int(endMonth), endYear)
+	// filename := fmt.Sprintf("/tmp/SL_%02v-%02v-%04v_%02v-%02v-%04v.xlsx", int(startMonth), startDay, startYear, int(endMonth), endDay, endYear)
+	filename := fmt.Sprintf("SL_%02v-%02v-%04v_%02v-%02v-%04v.xlsx", int(startMonth), startDay, startYear, int(endMonth), endDay, endYear)
 	if err := f.SaveAs(filename); err != nil {
 		fmt.Println(err)
 		return "", err
 	}
 
-	filename = strings.Join(strings.Split(filename, "/")[2:], "")
+	log.Println("filename --", filename)
+
+	splitFilename := strings.Split(filename, "/")
+
+	if len(splitFilename) >= 3 {
+		filename = strings.Join(splitFilename[2:], "")
+	}
 
 	return filename, nil
 }

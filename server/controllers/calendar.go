@@ -110,7 +110,7 @@ func (cal *Calendar) GetEvents(returnedStudent *models.Student, minLocalTime str
 			_safeSessionLength = 60
 		}
 
-		newEvent.Course = formatSubject(subjectData.SubjectName)
+		newEvent.Course = subjectData.SubjectName
 		newEvent.Fee = subjectData.PricePerSession * sessionDuration / float64(_safeSessionLength)
 		newEvent.Duration = fmt.Sprint(sessionDuration)
 		newEvent.Rate = subjectData.PricePerSession
@@ -156,8 +156,10 @@ func (cal *Calendar) getSubjectData(summaryStr string, subjects map[string]model
 	str := summaryStr
 
 	if strings.Contains(summaryStr, " - ") {
-		str = strings.Split(str, " - ")[0]
+		str = strings.Trim(strings.Split(str, " - ")[0], " ")
 	}
+
+	originalSubjectName := str
 
 	str = models.ComputeSubjectName(str)
 	sessionData, ok := subjects[str]
@@ -168,7 +170,7 @@ func (cal *Calendar) getSubjectData(summaryStr string, subjects map[string]model
 	}
 
 	// return str, price, nil
-	return subjectDataResponse{SubjectName: str, PricePerSession: sessionData.PricePerSession, SessionLengthInMinutes: sessionData.SessionLengthInMinutes}, nil
+	return subjectDataResponse{SubjectName: originalSubjectName, PricePerSession: sessionData.PricePerSession, SessionLengthInMinutes: sessionData.SessionLengthInMinutes}, nil
 }
 
 func getDateString(datetime *time.Time) string {
@@ -177,24 +179,11 @@ func getDateString(datetime *time.Time) string {
 	return fmt.Sprintf("%02v/%02v/%v", int(month), day, year)
 }
 
-func formatSubject(str string) string {
-	strSlice := strings.Split(str, "_")
-	output := []string{}
-
-	for _, s := range strSlice {
-		sRune := []rune(s)
-		l1 := strings.ToUpper(string(sRune[0]))
-		l2 := strings.ToLower(string(sRune[1:]))
-		word := fmt.Sprintf("%v%v", l1, l2)
-		output = append(output, word)
-	}
-
-	return strings.Join(output, " ")
-}
-
 func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (string, map[string]*[]DroppedEvent, error) {
 	timeLayout := "2006-01-02T15:04:05-07:00"
 	tmin, err := time.Parse(timeLayout, minLocalTime)
+
+	log.Println("minLocalTime", minLocalTime)
 
 	if err != nil {
 		alternativeTimeLayout := "2006-01-02T15:04:05Z"
@@ -222,6 +211,8 @@ func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (string, map[str
 		return "", nil, err
 	}
 
+	log.Println(students)
+
 	convDoc := []ConversionDoc{}
 	droppedEventsMap := make(map[string](*[]DroppedEvent))
 
@@ -243,6 +234,8 @@ func (cal *Calendar) ToExcel(minLocalTime, maxLocalTime string) (string, map[str
 
 		convDoc = append(convDoc, newConversionDoc)
 	}
+
+	log.Printf("\n\nCONVDOC: %+v\n\n", convDoc)
 
 	filepath, err := generateExcel(&convDoc, tmin.Day(), tmin.Month(), tmin.Year(), tmax.Day(), tmax.Month(), tmax.Year())
 

@@ -65,15 +65,15 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:8080/student/subjects
+POST http://localhost:8080/api/student/subjects
 Content-Type: application/json
 
 {
-  "studentId": "6412351ee1d7c9535f75536e",
+  "studentId": "6419541b0fcf839beb74d793",
   "subjects": [
     {
       "name": "Physics",
-      "pricePerSession": 60,
+      "pricePerSession": 59,
       "sessionLength": 45
     }
   ]
@@ -117,6 +117,14 @@ Content-Type: application/json
   "minLocalTime": "2023-03-01T05:00:00Z",
   "maxLocalTime": "2023-03-31T04:59:59Z"
 }
+### - UTC time
+POST http://localhost:8080/api/excel
+Content-Type: application/json
+
+{
+  "minLocalTime": "2022-12-01T05:00:00Z",
+  "maxLocalTime": "2023-03-31T04:59:59Z"
+}
 
 ###
 GET http://localhost:8080/excel
@@ -135,3 +143,6 @@ GET http://localhost:8080/api/excel?minLocalTime=2023-03-01T05:00:00Z&maxLocalTi
 
 ###
 GET http://localhost:8080/test/qwerty/1234
+
+###
+GET http://localhost:8080/api/students

@@ -76,6 +76,7 @@ func (dba *Database) AddTeacher(teacher *Teacher) error {
 }
 
 func (dba *Database) AddSubjects(subjectPayload SubjectPayload) error {
+	log.Println("subject payload", subjectPayload)
 	student, err := dba.GetStudentById(subjectPayload.StudentId)
 
 	if err != nil {
@@ -85,7 +86,7 @@ func (dba *Database) AddSubjects(subjectPayload SubjectPayload) error {
 	studentSubjects := student.Subjects
 
 	for _, subject := range subjectPayload.Subjects {
-		studentSubjects[subject.Name] = SessionData{PricePerSession: subject.PricePerSession, SessionLengthInMinutes: subject.SessionLengthInMinutes}
+		studentSubjects[subject.Name] = SessionData{PricePerSession: subject.PricePerSession, SessionLengthInMinutes: subject.SessionLengthInMinutes, OriginalFilename: subject.Name}
 	}
 
 	studentCollection := dba.db.Collection(StudentsCollection)
@@ -99,6 +100,7 @@ func (dba *Database) AddSubjects(subjectPayload SubjectPayload) error {
 	var lowercaseSubjects = make(map[string]SessionData)
 
 	for k, v := range studentSubjects {
+		log.Println("student subjects...", v)
 		computedKey := ComputeSubjectName(k)
 		lowercaseSubjects[computedKey] = v
 	}
