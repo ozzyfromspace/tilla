@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,7 +31,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	app := gin.New()
 	gin.SetMode(gin.ReleaseMode)
-	app.Use(gzip.Gzip(gzip.DefaultCompression))
+	// app.Use(gzip.Gzip(gzip.DefaultCompression))
 
 	app.Static("api/excel_files", "./excel_files")
 	app.Static("api/marshmallow", "./marshmallow")
